@@ -1,37 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Voyager } from "graphql-voyager";
+import BrowserOnly from "@docusaurus/BrowserOnly";
 import Layout from "@theme/Layout";
-import "graphql-voyager/dist/voyager.css";
 import Link from "@docusaurus/Link";
 import styles from "./styles.module.css";
-import { IntrospectionQuery, buildSchema } from "graphql";
 
 const SchemaPage = () => {
-  const [selectedEndpoint, setSelectedEndpoint] = useState(
-    "https://ckb-graph.unistate.io/v1/graphql",
-  );
-
-  const [introspectionData, setIntrospectionData] = useState(null);
-
-  useEffect(() => {
-    // 异步加载 SDL 文件
-    const loadSchema = async () => {
-      try {
-        const response = await fetch("/schema.sdl");
-        const sdlContent = await response.text();
-
-        // 从 SDL 构建 schema
-        const schema = buildSchema(sdlContent);
-
-        setIntrospectionData(schema);
-      } catch (error) {
-        console.error("Failed to load schema:", error);
-      }
-    };
-
-    loadSchema();
-  }, []);
-
   return (
     <Layout title="GraphQL Schema">
       <div className={styles.pageContainer}>
@@ -41,7 +14,41 @@ const SchemaPage = () => {
           </Link>
         </div>
         <div className={styles.graphiqlContainer}>
-          {introspectionData && <Voyager introspection={introspectionData} />}
+          <BrowserOnly>
+            {() => {
+              // 在这里动态引入只在浏览器端运行的组件
+              const { Voyager } = require("graphql-voyager");
+              require("graphql-voyager/dist/voyager.css");
+              const { buildSchema } = require("graphql");
+
+              // VoyagerWrapper 组件包含所有浏览器端逻辑
+              const VoyagerWrapper = () => {
+                const [introspectionData, setIntrospectionData] =
+                  useState(null);
+
+                useEffect(() => {
+                  const loadSchema = async () => {
+                    try {
+                      const response = await fetch("/schema.sdl");
+                      const sdlContent = await response.text();
+                      const schema = buildSchema(sdlContent);
+                      setIntrospectionData(schema);
+                    } catch (error) {
+                      console.error("Failed to load schema:", error);
+                    }
+                  };
+
+                  loadSchema();
+                }, []);
+
+                return introspectionData ? (
+                  <Voyager introspection={introspectionData} />
+                ) : null;
+              };
+
+              return <VoyagerWrapper />;
+            }}
+          </BrowserOnly>
         </div>
       </div>
     </Layout>

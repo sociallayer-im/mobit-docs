@@ -6,11 +6,11 @@ import "graphiql/graphiql.css";
 import Link from "@docusaurus/Link";
 import styles from "./styles.module.css";
 import "@docusaurus/theme-classic/lib/prism-include-languages";
-
+import BrowserOnly from "@docusaurus/BrowserOnly";
 
 function PlaygroundPage() {
   const [selectedEndpoint, setSelectedEndpoint] = useState(
-    "https://ckb-graph.unistate.io/v1/graphql"
+    "https://ckb-graph.unistate.io/v1/graphql",
   );
 
   const fetcher = async (graphQLParams: any) => {
@@ -35,7 +35,9 @@ function PlaygroundPage() {
           />
         </div>
         <div className={styles.graphiqlContainer}>
-          <GraphiQL fetcher={fetcher} />
+          <BrowserOnly fallback={<div>Loading...</div>}>
+            {() => <GraphiQL fetcher={fetcher} />}
+          </BrowserOnly>
         </div>
       </div>
     </Layout>
