@@ -7,11 +7,11 @@ const config: Config = {
   tagline: "Documentation for Mobit GraphQL API",
   favicon: "img/favicon.ico",
 
-  url: "https://your-docusaurus-site.example.com",
-  baseUrl: "/",
+  url: "https://sociallayer-im.github.io",
+  baseUrl: "/mobit-docs/",
 
   organizationName: "sociallayer-im",
-  projectName: "mobit-doc",
+  projectName: "mobit-docs",
 
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -35,7 +35,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: "./sidebars.ts",
-          editUrl: "https://github.com/sociallayer-im/mobit-doc/tree/main/",
+          editUrl: "https://github.com/sociallayer-im/mobit-docs/tree/main/",
           routeBasePath: "/", // Set documentation as homepage
         },
         blog: false, // Disable blog feature
@@ -48,7 +48,7 @@ const config: Config = {
 
   themeConfig: {
     navbar: {
-      title: "Mobit Documentation",
+      title: "Mobit Docs",
       logo: {
         alt: "Mobit Logo",
         src: "img/logo.svg",
@@ -59,7 +59,7 @@ const config: Config = {
           position: "right",
         },
         {
-          href: "https://github.com/sociallayer-im/mobit-doc",
+          href: "https://github.com/sociallayer-im/mobit-docs",
           label: "GitHub",
           position: "right",
         },
@@ -111,7 +111,7 @@ const config: Config = {
           items: [
             {
               label: "GitHub",
-              href: "https://github.com/sociallayer-im/mobit-doc",
+              href: "https://github.com/sociallayer-im/mobit-docs",
             },
           ],
         },
