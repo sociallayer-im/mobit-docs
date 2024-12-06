@@ -1,0 +1,18 @@
+.networkSelector {
+  display: flex;
+  gap: 8px;
+}
+
+.networkButton {
+  padding: 8px 16px;
+  border: 1px solid var(--ifm-color-primary);
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+  color: var(--ifm-color-primary);
+}
+
+.networkButton.active {
+  background: var(--ifm-color-primary);
+  color: white;
+}

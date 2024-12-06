@@ -1,0 +1,147 @@
+---
+sidebar_position: 5
+---
+
+import LightGraphQLPlayground from '@site/src/components/LightGraphQLPlayground';
+import GraphQLTypeDisplay from '@site/src/components/GraphQLTypeDisplay';
+import MermaidDiagram from '@site/src/components/MermaidDiagram';
+
+# RGBPP
+
+RGBPP（RGB++）是一个跨链资产系统，通过锁定脚本（Locks）和解锁脚本（Unlocks）实现资产在比特币网络和 CKB 网络间的安全转移。任何与 RGBPP Lock 关联的 XUDT（同质化代币）或 Spore（非同质化代币）都可以被视为 RGBPP 资产。
+
+## 系统架构
+
+<MermaidDiagram code={`
+graph TD
+    A[RGBPP Asset] --> B[XUDT]
+    A --> C[Spore]
+    B --> D[Associated RGBPP Lock]
+    C --> E[Associated RGBPP Lock]
+    D --> F[Bitcoin Network]
+    E --> F
+`} />
+
+## 1. RGBPP 锁定脚本 (Locks)
+
+RGBPP 锁定脚本（Locks）是系统的核心组成部分之一，负责在比特币网络和 CKB 网络之间安全地锁定和转移资产。每个锁定脚本都有唯一的标识符，并且关联到特定的比特币交易和 CKB 交易。通过这些脚本，系统能够确保资产的安全性和不可篡改性。
+
+<GraphQLTypeDisplay
+  typeName="rgbpp_locks"
+  typeDescription="RGBPPLocks 类型表示与 RGBPP 资产相关的锁定脚本。"
+  fields={[
+    { name: "lock_id", type: "bytea!", description: "锁定脚本的唯一标识符。格式：字节数组（以 \\\\x 前缀的十六进制）。例如：\\\\x430e98dc1272960a30f7cbd4bcbb4c6343021aff942c36fa1561e90129b2a9b5。" },
+    { name: "btc_txid", type: "bytea!", description: "与锁定脚本关联的比特币交易 ID。格式：字节数组（以 \\\\x 前缀的十六进制）。例如：\\\\xb5a9b22901e96115fa362c94ff1a0243634cbbbcd4cbf7300a967212dc980e43。" },
+    { name: "out_index", type: "Int!", description: "比特币交易中的输出索引。类型：整数。例如：1。" },
+    { name: "tx", type: "bytea!", description: "与锁定脚本关联的 CKB 交易哈希。格式：字节数组（以 \\\\x 前缀的十六进制）。例如：\\\\xabb260b6312831bc484656f3b2d4bf48e7a59d3ff35f21c4453fc46e0a13f484。" }
+  ]}
+/>
+
+通过以下 GraphQL 查询，您可以获取最新的 RGBPP 锁定脚本列表：
+
+查询 RGBPP Locks：
+
+<LightGraphQLPlayground
+  defaultQuery={`query GetRgbppLocks {
+    rgbpp_locks(limit: 5) {
+      tx
+      btc_txid
+      lock_id
+      out_index
+    }
+  }`}
+/>
+
+### 2. RGBPP 解锁脚本 (Unlocks)
+
+解锁脚本（Unlock Scripts）在 RGBPP 中扮演着关键角色，负责验证锁定脚本以允许资产在比特币网络和 CKB 网络之间的转移。每个解锁脚本都与特定的锁定脚本相关联，确保资产的安全性和可追溯性。
+
+<GraphQLTypeDisplay
+  typeName="rgbpp_unlocks"
+  typeDescription="RGBPPUnlocks 类型表示与 RGBPP 资产相关的解锁脚本。"
+  fields={[
+    { name: "unlock_id", type: "bytea!", description: "解锁脚本的唯一标识符。格式：字节数组（以 \\\\x 前缀的十六进制）。" },
+    { name: "version", type: "smallint!", description: "解锁脚本的版本号。类型：小整数。" },
+    { name: "input_len", type: "smallint!", description: "交易中的输入数量。类型：小整数。" },
+    { name: "output_len", type: "smallint!", description: "交易中的输出数量。类型：小整数。" },
+    { name: "btc_tx", type: "bytea!", description: "完整的比特币交易数据。格式：字节数组（以 \\\\x 前缀的十六进制）。" },
+    { name: "btc_tx_proof", type: "bytea!", description: "比特币交易有效性的证明。格式：字节数组（以 \\\\x 前缀的十六进制）。" },
+    { name: "tx", type: "bytea!", description: "与解锁脚本关联的 CKB 交易哈希。格式：字节数组（以 \\\\x 前缀的十六进制）。" }
+  ]}
+/>
+
+查询 RGBPP Unlocks：
+
+<LightGraphQLPlayground
+  defaultQuery={`query GetRgbppUnlocks {
+    rgbpp_unlocks(limit: 5) {
+      unlock_id
+      version
+      input_len
+      output_len
+      btc_tx
+      btc_tx_proof
+      tx
+    }
+  }`}
+/>
+
+## 重要说明
+
+:::info 资产识别
+- 任何具有关联 RGBPP Lock 的 XUDT 或 Spore 都是 RGBPP 资产
+- 通过 `rgbpp_locks` 表的记录来确认资产的 RGBPP 状态
+:::
+
+:::caution 所有权查询
+- GraphQL API 仅提供链上数据查询
+- 确定资产实际所有者需要使用 RGBPP SDK
+- SDK 会处理比特币交易验证和所有权追踪
+:::
+
+:::warning 数据关联
+- XUDT 和 Spore 通过关联的 RGBPP Lock 实现跨链能力
+- 一个 RGBPP Lock 可以同时关联 XUDT 或 Spore
+:::
+
+:::danger 查询限制
+- 链上数据只反映资产的锁定状态
+- 完整的所有权信息需要结合比特币网络数据
+- 建议使用 SDK 进行完整的资产查询和验证
+:::
+
+## 最佳实践
+
+### 查询优化
+
+1. **资产查询**
+   - 使用合适的索引字段
+   - 只请求必要的字段
+   - 对大量数据使用分页
+
+2. **状态检查**
+   - 验证 Lock 是否有效
+   - 确认资产是否被消费
+   - 确认跨链状态
+
+### 性能优化
+
+1. **批量查询**
+   - 使用 GraphQL 批处理
+   - 合并相关查询
+   - 缓存常用数据
+
+2. **数据验证**
+   - 本地缓存验证结果
+   - 异步处理比特币确认
+   - 增量更新状态
+
+通过理解这些组件和它们之间的关系，开发者可以正确识别和查询 RGBPP 资产，并在需要进行所有权验证时使用 SDK 进行更深入的分析。
+
+:::tip 开发建议
+在开发 RGBPP 应用时，建议：
+1. 先通过 GraphQL API 获取基础数据
+2. 使用 SDK 验证关键信息
+3. 实现适当的缓存策略
+4. 做好错误处理和重试机制
+:::

@@ -1,0 +1,147 @@
+---
+sidebar_position: 5
+---
+
+import LightGraphQLPlayground from '@site/src/components/LightGraphQLPlayground';
+import GraphQLTypeDisplay from '@site/src/components/GraphQLTypeDisplay';
+import MermaidDiagram from '@site/src/components/MermaidDiagram';
+
+# RGBPP
+
+RGBPP (RGB++) is a cross-chain asset system that facilitates the secure transfer of assets between the Bitcoin network and the CKB network through locking scripts (Locks) and unlocking scripts (Unlocks). Any XUDT (fungible token) or Spore (non-fungible token) associated with an RGBPP Lock can be considered an RGBPP asset.
+
+## System Architecture
+
+<MermaidDiagram code={`
+graph TD
+    A[RGBPP Asset] --> B[XUDT]
+    A --> C[Spore]
+    B --> D[Associated RGBPP Lock]
+    C --> E[Associated RGBPP Lock]
+    D --> F[Bitcoin Network]
+    E --> F
+`} />
+
+## 1. RGBPP Locking Scripts (Locks)
+
+RGBPP locking scripts (Locks) are a core component of the system, responsible for securely locking and transferring assets between the Bitcoin network and the CKB network. Each locking script has a unique identifier and is linked to specific Bitcoin and CKB transactions. Through these scripts, the system ensures the security and immutability of the assets.
+
+<GraphQLTypeDisplay
+  typeName="rgbpp_locks"
+  typeDescription="The RGBPPLocks type represents locking scripts associated with RGBPP assets."
+  fields={[
+    { name: "lock_id", type: "bytea!", description: "Unique identifier for the locking script. Format: byte array (hexadecimal prefixed with \\\\x). Example: \\\\x430e98dc1272960a30f7cbd4bcbb4c6343021aff942c36fa1561e90129b2a9b5." },
+    { name: "btc_txid", type: "bytea!", description: "Bitcoin transaction ID associated with the locking script. Format: byte array (hexadecimal prefixed with \\\\x). Example: \\\\xb5a9b22901e96115fa362c94ff1a0243634cbbbcd4cbf7300a967212dc980e43." },
+    { name: "out_index", type: "Int!", description: "Output index in the Bitcoin transaction. Type: integer. Example: 1." },
+    { name: "tx", type: "bytea!", description: "CKB transaction hash associated with the locking script. Format: byte array (hexadecimal prefixed with \\\\x). Example: \\\\xabb260b6312831bc484656f3b2d4bf48e7a59d3ff35f21c4453fc46e0a13f484." }
+  ]}
+/>
+
+You can retrieve the latest RGBPP locking scripts list using the following GraphQL query:
+
+Query RGBPP Locks:
+
+<LightGraphQLPlayground
+  defaultQuery={`query GetRgbppLocks {
+    rgbpp_locks(limit: 5) {
+      tx
+      btc_txid
+      lock_id
+      out_index
+    }
+  }`}
+/>
+
+### 2. RGBPP Unlocking Scripts (Unlocks)
+
+Unlocking scripts (Unlock Scripts) play a critical role in RGBPP by validating locking scripts to allow the transfer of assets between the Bitcoin network and the CKB network. Each unlocking script is associated with a specific locking script, ensuring the security and traceability of the assets.
+
+<GraphQLTypeDisplay
+  typeName="rgbpp_unlocks"
+  typeDescription="The RGBPPUnlocks type represents unlocking scripts associated with RGBPP assets."
+  fields={[
+    { name: "unlock_id", type: "bytea!", description: "Unique identifier for the unlocking script. Format: byte array (hexadecimal prefixed with \\\\x)." },
+    { name: "version", type: "smallint!", description: "Version number of the unlocking script. Type: small integer." },
+    { name: "input_len", type: "smallint!", description: "Number of inputs in the transaction. Type: small integer." },
+    { name: "output_len", type: "smallint!", description: "Number of outputs in the transaction. Type: small integer." },
+    { name: "btc_tx", type: "bytea!", description: "Complete Bitcoin transaction data. Format: byte array (hexadecimal prefixed with \\\\x)." },
+    { name: "btc_tx_proof", type: "bytea!", description: "Proof of the validity of the Bitcoin transaction. Format: byte array (hexadecimal prefixed with \\\\x)." },
+    { name: "tx", type: "bytea!", description: "CKB transaction hash associated with the unlocking script. Format: byte array (hexadecimal prefixed with \\\\x)." }
+  ]}
+/>
+
+Query RGBPP Unlocks:
+
+<LightGraphQLPlayground
+  defaultQuery={`query GetRgbppUnlocks {
+    rgbpp_unlocks(limit: 5) {
+      unlock_id
+      version
+      input_len
+      output_len
+      btc_tx
+      btc_tx_proof
+      tx
+    }
+  }`}
+/>
+
+## Important Notes
+
+:::info Asset Identification
+- Any XUDT or Spore associated with an RGBPP Lock is considered an RGBPP asset.
+- Confirm the RGBPP status of an asset through records in the `rgbpp_locks` table.
+:::
+
+:::caution Ownership Queries
+- The GraphQL API only provides on-chain data queries.
+- Determining the actual owner of an asset requires the use of the RGBPP SDK.
+- The SDK handles Bitcoin transaction validation and ownership tracking.
+:::
+
+:::warning Data Association
+- XUDT and Spore achieve cross-chain capabilities through associated RGBPP Locks.
+- A single RGBPP Lock can be associated with both XUDT and Spore.
+:::
+
+:::danger Query Limitations
+- On-chain data only reflects the locking status of assets.
+- Complete ownership information requires integration with Bitcoin network data.
+- It is recommended to use the SDK for comprehensive asset queries and validations.
+:::
+
+## Best Practices
+
+### Query Optimization
+
+1. **Asset Queries**
+   - Use appropriate indexed fields.
+   - Request only the necessary fields.
+   - Implement pagination for large datasets.
+
+2. **Status Checks**
+   - Verify whether a Lock is valid.
+   - Confirm if the asset has been consumed.
+   - Check cross-chain status.
+
+### Performance Optimization
+
+1. **Batch Queries**
+   - Utilize GraphQL batching.
+   - Merge related queries.
+   - Cache frequently accessed data.
+
+2. **Data Validation**
+   - Validate results using local caching.
+   - Process Bitcoin confirmations asynchronously.
+   - Incrementally update status.
+
+By understanding these components and their interrelations, developers can accurately identify and query RGBPP assets and use the SDK for deeper analysis when ownership validation is necessary.
+
+:::tip Development Recommendations
+When developing RGBPP applications, it is advisable to:
+1. First obtain foundational data through the GraphQL API.
+2. Use the SDK to validate critical information.
+3. Implement appropriate caching strategies.
+4. Ensure robust error handling and retry mechanisms.
+:::

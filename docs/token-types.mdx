@@ -1,0 +1,310 @@
+---
+sidebar_position: 4
+---
+
+import LightGraphQLPlayground from '@site/src/components/LightGraphQLPlayground';
+import GraphQLTypeDisplay from '@site/src/components/GraphQLTypeDisplay';
+
+# XUDT
+
+CKB Token系统由两个核心组件构成：Token Info（代币信息）和XUDT Cell（代币单元格）。本文档将详细阐述这两个组件的数据结构及其查询方法。
+
+## Token Info（代币信息）
+
+TokenInfo类型在CKB系统中扮演着至关重要的角色，它包含了代币的基本信息，这些信息对于代币的管理和查询至关重要。以下是TokenInfo类型的字段说明：
+
+<GraphQLTypeDisplay
+  typeName="token_info"
+  typeDescription="TokenInfo类型表示CKB系统中代币的基本信息。"
+  fields={[
+    { name: "type_id", type: "String!", description: "代币的唯一标识符，通常是一个地址，用于区分不同的代币种类。类型: 字符串。" },
+    { name: "name", type: "String!", description: "代币的全称，用于描述代币的名称。类型: 字符串。" },
+    { name: "symbol", type: "String!", description: "代币的简称，通常用于在交易界面中显示。类型: 字符串。" },
+    { name: "decimal", type: "smallint!", description: "代币的小数位数，决定了代币的最小单位。类型: 小整数。" },
+    { name: "expected_supply", type: "numeric", description: "代币发行方预期的总供应量。类型: 数值。可为空: true。" },
+    { name: "mint_limit", type: "numeric", description: "代币的最大铸造数量限制。类型: 数值。可为空: true。" },
+    { name: "mint_status", type: "smallint", description: "代币的当前铸造状态。类型: 小整数。枚举值包括: MINTABLE (0) 表示可以继续铸造，MINT_CLOSED (1) 表示铸造已关闭，REBASE_STARTED (2) 表示正在进行重置。" },
+    { name: "transaction_hash", type: "bytea!", description: "创建或更新该代币信息的交易哈希值。格式: 字节数组（以 \\x 前缀的十六进制）。" },
+    { name: "transaction_index", type: "Int!", description: "交易中的输出索引位置。类型: 整数。" },
+    { name: "inscription_id", type: "String", description: "与代币关联的铭文ID，如果存在的话。类型: 字符串。可为空: true。" },
+    { name: "udt_hash", type: "bytea", description: "与代币关联的UDT合约哈希。格式: 字节数组（以 \\x 前缀的十六进制）。可为空: true。" }
+  ]}
+/>
+
+:::info 铸造状态枚举值
+```graphql
+enum MintStatus {
+  MINTABLE = 0        # 可继续铸造
+  MINT_CLOSED = 1     # 铸造已结束
+  REBASE_STARTED = 2  # 已进入重置阶段
+}
+```
+:::
+
+理解这些字段对于开发者来说非常重要，它们可以帮助您更准确地查询和管理代币。下面是一些常用的查询示例，帮助您更好地利用TokenInfo类型。
+
+### 常用查询示例
+
+#### 查询任意代币类型的基本信息
+
+如果您想要获取系统中前五种代币的基本信息，可以使用以下查询：
+
+<LightGraphQLPlayground
+  defaultQuery={`query GetTokenInfos {
+    token_info(limit:5) {
+      name
+      symbol
+      decimal
+      expected_supply
+      mint_status
+    }
+  }`}
+/>
+
+#### 查询特定代币类型的基本信息
+
+如果您知道某个代币的类型ID，并且想要获取其详细信息，可以使用以下查询：
+
+<LightGraphQLPlayground
+  defaultQuery={`query GetTokenInfo($typeId: String!) {
+  token_info(where: { type_id: { _eq: $typeId } }) {
+    name
+    symbol
+    decimal
+    expected_supply
+    mint_status
+  }
+}`}
+  defaultVariables={`{
+  "typeId": "ckt1qpg0m63dqqc2359n660csw68rj4j52w2umcpjgl3nnk2cre8lk42vqtjqktadl0rtjfm8gczf82665uka2udhdc2etlm7tu9cruuax6psqc4nprk"
+}`}
+/>
+
+#### 查询前五个可铸造的代币信息
+
+如果您想获取前五个当前可铸造代币的详细信息，可以使用以下查询：
+
+<LightGraphQLPlayground
+  defaultQuery={`query GetMintableTokens {
+  token_info(
+    limit: 5,
+    where: {
+      mint_status: { _eq: 0 }  # MINTABLE
+    }
+  ) {
+    type_id
+    name
+    symbol
+    mint_limit
+    expected_supply
+  }
+}`}
+/>
+
+#### 按代币状态和供应量过滤
+
+要过滤出特定状态和预期供应量的代币，可以使用以下查询：
+
+<LightGraphQLPlayground
+  defaultQuery={`query FilterTokensByStatus {
+  token_info(
+    where: {
+      _and: [
+        { mint_status: { _in: [0, 1] } },  # MINTABLE 或 MINT_CLOSED
+        { expected_supply: { _is_null: false } }
+      ]
+    }
+  ) {
+    name
+    symbol
+    mint_status
+    expected_supply
+  }
+}`}
+/>
+
+
+## XUDT Cell（代币单元格）
+
+XUDT Cell类型表示CKB系统中包含代币数量的单元格。以下是XUDT Cell类型的字段说明：
+
+<GraphQLTypeDisplay
+  typeName="xudt_cell"
+  typeDescription="XUDTCell类型表示CKB系统中包含代币数量的单元格。"
+  fields={[
+    { name: "amount", type: "numeric!", description: "单元格中代币的数量。类型: 数值。" },
+    { name: "is_consumed", type: "Boolean!", description: "指示该单元格是否已被消费。类型: 布尔值。" },
+    { name: "lock_id", type: "String!", description: "与单元格关联的锁定脚本地址。类型: 字符串。" },
+    { name: "type_id", type: "String!", description: "代币的类型标识符。类型: 字符串。" },
+    { name: "transaction_hash", type: "bytea!", description: "与单元格关联的交易哈希值。格式: 字节数组（以 \\x 前缀的十六进制）。" },
+    { name: "transaction_index", type: "Int!", description: "交易中的输出索引位置。类型: 整数。" },
+    { name: "xudt_args", type: "[String!]", description: "特定于XUDT单元格的参数。类型: 字符串数组。" },
+    { name: "xudt_data", type: "[String!]", description: "特定于XUDT单元格的数据。类型: 字符串数组。" },
+    { name: "xudt_data_lock", type: "bytea", description: "XUDT单元格的数据锁定脚本。格式: 字节数组（以 \\x 前缀的十六进制）。可为空: true。" },
+    { name: "xudt_owner_lock_script_hash", type: "bytea", description: "XUDT单元格的所有者锁定脚本哈希。格式: 字节数组（以 \\x 前缀的十六进制）。可为空: true。" }
+  ]}
+/>
+
+### 常用查询示例
+
+#### 查询地址的代币余额
+
+要查询特定地址持有的所有代币，可以使用以下查询：
+
+<LightGraphQLPlayground
+  defaultQuery={`query GetAddressTokens($lockId: String!) {
+  xudt_cell(
+    where: {
+      lock_id: { _eq: $lockId },
+      is_consumed: { _eq: false }
+    }
+  ) {
+    amount
+    type_id
+    addressByTypeId {
+      token_info {
+        name
+        symbol
+        decimal
+      }
+    }
+  }
+}`}
+  defaultVariables={`{
+  "lockId": "ckt1qrejnmlar3r452tcg57gvq8patctcgy8acync0hxfnyka35ywafvkqgp3r7g3djanfsn5xk487e0g8juh8r5r7mdqqkzm504"
+}`}
+/>
+
+#### 查询代币交易历史
+
+要查看特定代币类型的交易历史，可以使用以下查询：
+
+<LightGraphQLPlayground
+  defaultQuery={`query GetTokenTransactions($typeId: String!) {
+  xudt_cell(
+    where: { type_id: { _eq: $typeId } }
+    order_by: { transaction_index: desc }
+  ) {
+    amount
+    transaction_hash
+    is_consumed
+    lock_id
+  }
+}`}
+  defaultVariables={`{
+  "typeId": "ckt1qqju98wrz7q35mm08xz6020tcjpch5ug6xwslmhv7z7dvrmvp96mkqdw3fgja6ckhv229jh6skfkymtxgmz0yxssqueg7mtyknc05xezlur24eys"
+}`}
+/>
+
+#### 计算代币总供应量
+
+要计算特定代币的当前流通总量，可以使用以下查询：
+
+<LightGraphQLPlayground
+  defaultQuery={`query GetTokenSupply($typeId: String!) {
+  xudt_cell(
+    where: {
+      type_id: { _eq: $typeId },
+      is_consumed: { _eq: false }
+    }
+  ) {
+    amount
+  }
+}`}
+  defaultVariables={`{
+  "typeId": "ckt1qqju98wrz7q35mm08xz6020tcjpch5ug6xwslmhv7z7dvrmvp96mkqdw3fgja6ckhv229jh6skfkymtxgmz0yxssqueg7mtyknc05xezlur24eys"
+}`}
+/>
+
+#### 查询代币持有者分布
+
+要分析代币的持有者分布情况，可以使用以下查询：
+
+<LightGraphQLPlayground
+  defaultQuery={`query GetTokenHolders($typeId: String!) {
+  xudt_cell(
+    where: {
+      type_id: { _eq: $typeId },
+      is_consumed: { _eq: false }
+    }
+    distinct_on: [lock_id]
+  ) {
+    lock_id
+    amount
+    addressByTypeId {
+      token_info {
+        name
+        symbol
+      }
+    }
+  }
+}`}
+  defaultVariables={`{
+  "typeId": "ckt1qqju98wrz7q35mm08xz6020tcjpch5ug6xwslmhv7z7dvrmvp96mkqdw3fgja6ckhv229jh6skfkymtxgmz0yxssqueg7mtyknc05xezlur24eys"
+}`}
+/>
+
+#### 按持有量范围过滤
+
+要查询持有量在特定范围内的XUDT Cell，可以使用以下查询：
+
+<LightGraphQLPlayground
+  defaultQuery={`query FilterByAmount {
+  xudt_cell(
+    where: {
+      amount: {
+        _gt: "1000000000",  # 大于1000代币（假设精度为9）
+        _lt: "10000000000"
+      }
+    }
+  ) {
+    amount
+    lock_id
+    type_id
+  }
+}`}
+/>
+
+## 注意事项
+
+:::caution 精度处理
+- `decimal`字段定义了代币的精度
+- 实际金额计算公式：`实际金额 = amount / (10 ^ decimal)`
+- 在显示金额时务必考虑精度转换
+:::
+
+:::warning XUDT数据解析
+- `xudt_args`和`xudt_data`可能包含额外的协议数据
+- 需要根据具体协议规范解析这些字段
+- 确保正确处理二进制数据
+:::
+
+:::important 状态验证
+- 始终检查`is_consumed`字段以确保UTXO有效
+- 使用`mint_status`验证代币的当前状态
+- 验证交易输出的有效性
+:::
+
+## 最佳实践
+
+1. **代币金额处理**
+   - 始终考虑代币精度
+   - 使用BigInt或适当的库处理大数字
+   - 展示时正确格式化金额
+
+2. **查询优化**
+   - 使用适当的索引字段
+   - 对大量数据使用分页
+   - 只查询必要的字段
+
+3. **数据验证**
+   - 验证代币状态的有效性
+   - 检查交易输出的消费状态
+   - 确保数据的完整性
+
+4. **错误处理**
+   - 处理查询超时情况
+   - 适当处理空值
+   - 验证返回数据的格式
+
+通过理解和正确使用这些数据结构和查询模式，您可以有效地与RGBPP Token系统进行交互，实现代币查询、跟踪和分析功能。

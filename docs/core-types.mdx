@@ -1,0 +1,197 @@
+---
+sidebar_position: 2
+---
+
+import LightGraphQLPlayground from '@site/src/components/LightGraphQLPlayground';
+import GraphQLTypeDisplay from '@site/src/components/GraphQLTypeDisplay';
+
+# Core
+
+## `Addresses`
+
+`addresses` 是 Mobit 索引系统中的核心概念之一，几乎所有的 `script` 数据都会被映射到 `addresses` 中。
+
+<GraphQLTypeDisplay
+  typeName="addresses"
+  typeDescription="Addresses 类型代表区块链中的地址信息。"
+  fields={[
+    { name: "id", type: "String!", description: "地址的字符串表示形式，遵循 CKB 地址格式（例如：ckt1qqju98wrz7q35mm08xz6020tcjpch5ug6xwslmhv7z7dvrmvp96mkqdw3fgja6ckhv229jh6skfkymtxgmz0yxssqueg7mtyknc05xezlur24eys）。用途：唯一标识区块链网络中的一个地址。" },
+    { name: "script_args", type: "bytea!", description: "脚本参数，格式为以 \\x 开头的十六进制字节数组。用途：包含脚本所需的参数，例如 SECP256K1 脚本的公钥哈希。示例值：\\xae8a512eeb16bb14a2cafa8593626d6646c4f21a1007328f6d64b4f0fa1b22ff。" },
+    { name: "script_code_hash", type: "bytea!", description: "脚本代码哈希，格式为 32 字节哈希值。用途：唯一标识使用的锁定/解锁脚本。示例值：\\x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb。" },
+    { name: "script_hash_type", type: "smallint!", description: "脚本哈希类型，取值为 0（Data 哈希）或 1（Type 哈希）。用途：确定 script_code_hash 的解释方式。示例值：1。" }
+  ]}
+/>
+
+您可以通过以下查询示例获取实时结果：
+
+<LightGraphQLPlayground
+  defaultQuery={`query QueryAddresses {
+    addresses(limit: 1) {
+      id
+      script_args
+      script_code_hash
+      script_hash_type
+    }
+  }
+`}
+/>
+
+尽管这些是 `addresses` 的基本字段，但它们真正强大的地方在于所支持的丰富索引。例如，您可以查询与特定地址关联的 `token_info`：
+
+<LightGraphQLPlayground
+  defaultQuery={`query QueryTokenInfo {
+  addresses(limit: 1, where: {script_args: {_eq: "\\xb73b6ab39d79390c6de90a09c96b290c331baf1798ed6f97aed02590929734e800000080"}, script_code_hash: {_eq: "\\x50bd8d6680b8b9cf98b73f3c08faf8b2a21914311954118ad6609be6e78a1b95"}}) {
+    id
+    script_args
+    script_code_hash
+    script_hash_type
+    token_info {
+      decimal
+      expected_supply
+      inscription_id
+      mint_limit
+      mint_status
+      name
+      symbol
+      transaction_hash
+      transaction_index
+      type_id
+      udt_hash
+    }
+  }
+}
+`}
+/>
+
+当然，您也可以定义变量来增强查询的灵活性：
+
+<LightGraphQLPlayground
+  defaultQuery={`
+    query QueryTokenInfo($limit: Int, $scriptArgs: String, $scriptCodeHash: String) {
+      addresses(limit: $limit, where: {script_args: {_eq: $scriptArgs}, script_code_hash: {_eq: $scriptCodeHash}}) {
+        id
+        script_args
+        script_code_hash
+        script_hash_type
+        token_info {
+          decimal
+          expected_supply
+          inscription_id
+          mint_limit
+          mint_status
+          name
+          symbol
+          transaction_hash
+          transaction_index
+          type_id
+          udt_hash
+        }
+      }
+    }
+  `}
+  defaultVariables={`{
+    limit: 1,
+    scriptArgs: "\\xb73b6ab39d79390c6de90a09c96b290c331baf1798ed6f97aed02590929734e800000080",
+    scriptCodeHash: "\\x50bd8d6680b8b9cf98b73f3c08faf8b2a21914311954118ad6609be6e78a1b95"
+  }`}
+/>
+
+
+:::caution 注意
+
+在查询中，请务必使用 `\\x` 前缀表示十六进制字节字符串，而非 `0x`。例如，`0x1a2b3c` 应被写作 `\\x1a2b3c`。
+
+:::
+
+除了 `token_infos`，您还可以查询其他实体，如 `spores`、`xudt_cells` 等。具体支持的查询类型，请参考 [GraphQL Playground](/playground) 文档。
+
+## `BlockHeight`
+
+`block_height`反映了索引器已同步至的最新区块。这一信息对于验证某些交易是否已被索引尤为重要。
+
+<GraphQLTypeDisplay
+  typeName="block_height"
+  typeDescription="BlockHeight 类型代表当前区块高度信息。"
+  fields={[
+    { name: "height", type: "bigint!", description: "当前已索引的区块高度。类型：bigint。用途：指示索引器已处理的区块高度。应用场景：检查同步状态和数据新鲜度。" },
+    { name: "id", type: "Int!", description: "记录标识符。固定值：1。用途：鉴于仅存在一条记录，其值始终为 1。" }
+  ]}
+/>
+
+获取当前区块高度的查询如下：
+
+<LightGraphQLPlayground
+  defaultQuery={`query GetSyncStatus {
+  block_height {
+    height
+  }
+}`}
+/>
+
+## `TransactionOutputsStatus`
+
+`transaction_outputs_status` 用于记录交易输出的当前状态。构建新交易时，需选用尚未被消费的 `outputs` 作为新的 `inputs`。
+
+<GraphQLTypeDisplay
+  typeName="transaction_outputs_status"
+  typeDescription="TransactionOutputsStatus 类型代表交易输出的状态。"
+  fields={[
+    { name: "consumed_input_transaction_hash", type: "bytea", description: "消费此输出的交易哈希。格式：32 字节哈希值。可为空：若未被消费，则为空。用途：追踪 UTXO 的消费状态。" },
+    { name: "consumed_input_transaction_index", type: "Int", description: "消费输入的索引。类型：整数。可为空：若未被消费，则为空。用途：指示消费交易的输入列表中的位置。" },
+    { name: "output_transaction_hash", type: "bytea!", description: "创建该输出的交易哈希。格式：32 字节哈希值。用途：标识创建此 UTXO 的交易。" },
+    { name: "output_transaction_index", type: "Int!", description: "输出的索引。类型：整数。用途：指示交易输出列表中的位置。范围：从 0 开始。" }
+  ]}
+/>
+
+查询部分`transaction_outputs_status`：
+
+<LightGraphQLPlayground
+  defaultQuery={`query QueryOutputsStatus {
+  transaction_outputs_status(limit: 10) {
+    consumed_input_transaction_hash
+    consumed_input_transaction_index
+    output_transaction_hash
+    output_transaction_index
+  }
+}`}
+/>
+
+查询特定`transaction_outputs_status`：
+
+<LightGraphQLPlayground
+  defaultQuery={`query GetUtxoStatus($txHash: bytea!) {
+  transaction_outputs_status(
+    where: { output_transaction_hash: { _eq: $txHash } }
+  ) {
+    output_transaction_index
+    consumed_input_transaction_hash
+  }
+}`}
+  defaultVariables={`{
+  "txHash": "\\xc30a1a6e264b7f21aa69ecea9159f60b54ec4c81a00630e21e4a77842b5c69e1"
+}`}
+/>
+
+## 实际应用场景
+
+1. **UTXO 追踪**
+   - 检查特定输出是否已被消费
+   - 追踪资产转移路径
+
+2. **地址验证**
+   - 验证地址的脚本类型
+   - 检查地址的锁定脚本参数
+
+3. **同步状态监控**
+   - 监控索引器同步状态
+   - 确保数据时效性
+
+:::tip 提示
+所有返回 `bytea` 类型的字段在查询时需使用 `\x` 前缀的十六进制格式。
+:::
+
+:::caution 注意
+在生产环境中使用时，请确保妥善处理错误情况，并验证返回的数据。
+:::
+
+通过深入理解这些核心字段的含义和用途，您可以更有效地设计查询和处理数据。这些字段构成了 Mobit 系统中资产追踪和管理的基础。

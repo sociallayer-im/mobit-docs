@@ -1,0 +1,50 @@
+{
+  "link.title.Documentation": {
+    "message": "文档",
+    "description": "页脚中标题为文档的链接列标题"
+  },
+  "link.title.Community": {
+    "message": "社区",
+    "description": "页脚中标题为社区的链接列标题"
+  },
+  "link.title.More": {
+    "message": "更多",
+    "description": "页脚中标题为更多的链接列标题"
+  },
+  "link.item.label.Intro": {
+    "message": "简介",
+    "description": "页脚链接标签为简介，链接到 /intro"
+  },
+  "link.item.label.Core Types": {
+    "message": "核心类型",
+    "description": "页脚链接标签为核心类型，链接到 /core-types"
+  },
+  "link.item.label.Spore": {
+    "message": "Spore",
+    "description": "页脚链接标签为Spore，链接到 /spore-types"
+  },
+  "link.item.label.Token": {
+    "message": "Token",
+    "description": "页脚链接标签为Token，链接到 /token-types"
+  },
+  "link.item.label.RGBPP": {
+    "message": "RGBPP",
+    "description": "页脚链接标签为RGBPP，链接到 /rgbpp-types"
+  },
+  "link.item.label.Discord": {
+    "message": "Discord",
+    "description": "页脚链接标签为Discord，链接到 https://discord.gg/your-discord"
+  },
+  "link.item.label.Twitter": {
+    "message": "Twitter",
+    "description": "页脚链接标签为Twitter，链接到 https://twitter.com/your-twitter"
+  },
+  "link.item.label.GitHub": {
+    "message": "GitHub",
+    "description": "页脚链接标签为GitHub，链接到 https://github.com/sociallayer-im/mobit-doc"
+  },
+  "copyright": {
+    "message": "版权所有 © 2024 Mobit 文档。由 Docusaurus 构建。",
+    "description": "页脚版权声明"
+  }
+}
