@@ -1,0 +1,3078 @@
+schema {
+  query: query_root
+  subscription: subscription_root
+}
+
+"""whether this query should be cached (Hasura Cloud only)"""
+directive @cached(
+  """measured in seconds"""
+  ttl: Int! = 60
+
+  """refresh the cache entry"""
+  refresh: Boolean! = false
+) on QUERY
+
+"""
+Boolean expression to compare columns of type "Boolean". All fields are combined with logical 'AND'.
+"""
+input Boolean_comparison_exp {
+  _eq: Boolean
+  _gt: Boolean
+  _gte: Boolean
+  _in: [Boolean!]
+  _is_null: Boolean
+  _lt: Boolean
+  _lte: Boolean
+  _neq: Boolean
+  _nin: [Boolean!]
+}
+
+"""
+Boolean expression to compare columns of type "Int". All fields are combined with logical 'AND'.
+"""
+input Int_comparison_exp {
+  _eq: Int
+  _gt: Int
+  _gte: Int
+  _in: [Int!]
+  _is_null: Boolean
+  _lt: Int
+  _lte: Int
+  _neq: Int
+  _nin: [Int!]
+}
+
+"""
+Boolean expression to compare columns of type "String". All fields are combined with logical 'AND'.
+"""
+input String_array_comparison_exp {
+  """is the array contained in the given array value"""
+  _contained_in: [String!]
+
+  """does the array contain the given value"""
+  _contains: [String!]
+  _eq: [String!]
+  _gt: [String!]
+  _gte: [String!]
+  _in: [[String!]!]
+  _is_null: Boolean
+  _lt: [String!]
+  _lte: [String!]
+  _neq: [String!]
+  _nin: [[String!]!]
+}
+
+"""
+Boolean expression to compare columns of type "String". All fields are combined with logical 'AND'.
+"""
+input String_comparison_exp {
+  _eq: String
+  _gt: String
+  _gte: String
+
+  """does the column match the given case-insensitive pattern"""
+  _ilike: String
+  _in: [String!]
+
+  """
+  does the column match the given POSIX regular expression, case insensitive
+  """
+  _iregex: String
+  _is_null: Boolean
+
+  """does the column match the given pattern"""
+  _like: String
+  _lt: String
+  _lte: String
+  _neq: String
+
+  """does the column NOT match the given case-insensitive pattern"""
+  _nilike: String
+  _nin: [String!]
+
+  """
+  does the column NOT match the given POSIX regular expression, case insensitive
+  """
+  _niregex: String
+
+  """does the column NOT match the given pattern"""
+  _nlike: String
+
+  """
+  does the column NOT match the given POSIX regular expression, case sensitive
+  """
+  _nregex: String
+
+  """does the column NOT match the given SQL regular expression"""
+  _nsimilar: String
+
+  """
+  does the column match the given POSIX regular expression, case sensitive
+  """
+  _regex: String
+
+  """does the column match the given SQL regular expression"""
+  _similar: String
+}
+
+"""
+columns and relationships of "_sqlx_migrations"
+"""
+type _sqlx_migrations {
+  checksum: bytea!
+  description: String!
+  execution_time: bigint!
+  installed_on: timestamptz!
+  success: Boolean!
+  version: bigint!
+}
+
+"""
+Boolean expression to filter rows from the table "_sqlx_migrations". All fields are combined with a logical 'AND'.
+"""
+input _sqlx_migrations_bool_exp {
+  _and: [_sqlx_migrations_bool_exp!]
+  _not: _sqlx_migrations_bool_exp
+  _or: [_sqlx_migrations_bool_exp!]
+  checksum: bytea_comparison_exp
+  description: String_comparison_exp
+  execution_time: bigint_comparison_exp
+  installed_on: timestamptz_comparison_exp
+  success: Boolean_comparison_exp
+  version: bigint_comparison_exp
+}
+
+"""Ordering options when selecting data from "_sqlx_migrations"."""
+input _sqlx_migrations_order_by {
+  checksum: order_by
+  description: order_by
+  execution_time: order_by
+  installed_on: order_by
+  success: order_by
+  version: order_by
+}
+
+"""
+select columns of table "_sqlx_migrations"
+"""
+enum _sqlx_migrations_select_column {
+  """column name"""
+  checksum
+
+  """column name"""
+  description
+
+  """column name"""
+  execution_time
+
+  """column name"""
+  installed_on
+
+  """column name"""
+  success
+
+  """column name"""
+  version
+}
+
+"""
+Streaming cursor of the table "_sqlx_migrations"
+"""
+input _sqlx_migrations_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: _sqlx_migrations_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input _sqlx_migrations_stream_cursor_value_input {
+  checksum: bytea
+  description: String
+  execution_time: bigint
+  installed_on: timestamptz
+  success: Boolean
+  version: bigint
+}
+
+"""Stores unique identifiers for script addresses used in transactions."""
+type addresses {
+  """An array relationship"""
+  clusters(
+    """distinct select on columns"""
+    distinct_on: [clusters_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [clusters_order_by!]
+
+    """filter the rows returned"""
+    where: clusters_bool_exp
+  ): [clusters!]!
+
+  """An array relationship"""
+  clustersByTypeId(
+    """distinct select on columns"""
+    distinct_on: [clusters_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [clusters_order_by!]
+
+    """filter the rows returned"""
+    where: clusters_bool_exp
+  ): [clusters!]!
+
+  """Unique identifier for the address, typically a string representation."""
+  id: String!
+
+  """An object relationship"""
+  inscription_info: token_info
+
+  """Arguments passed to the script."""
+  script_args: bytea!
+
+  """The code hash of the script associated with this address."""
+  script_code_hash: bytea!
+
+  """The hash type of the script, indicating how the script is interpreted."""
+  script_hash_type: smallint!
+
+  """An array relationship"""
+  sporeActionsByToAddressId(
+    """distinct select on columns"""
+    distinct_on: [spore_actions_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [spore_actions_order_by!]
+
+    """filter the rows returned"""
+    where: spore_actions_bool_exp
+  ): [spore_actions!]!
+
+  """An array relationship"""
+  spore_actions(
+    """distinct select on columns"""
+    distinct_on: [spore_actions_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [spore_actions_order_by!]
+
+    """filter the rows returned"""
+    where: spore_actions_bool_exp
+  ): [spore_actions!]!
+
+  """An array relationship"""
+  spores(
+    """distinct select on columns"""
+    distinct_on: [spores_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [spores_order_by!]
+
+    """filter the rows returned"""
+    where: spores_bool_exp
+  ): [spores!]!
+
+  """An array relationship"""
+  sporesByTypeId(
+    """distinct select on columns"""
+    distinct_on: [spores_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [spores_order_by!]
+
+    """filter the rows returned"""
+    where: spores_bool_exp
+  ): [spores!]!
+
+  """An object relationship"""
+  token_info: token_info
+
+  """An array relationship"""
+  token_infos(
+    """distinct select on columns"""
+    distinct_on: [token_info_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [token_info_order_by!]
+
+    """filter the rows returned"""
+    where: token_info_bool_exp
+  ): [token_info!]!
+
+  """An array relationship"""
+  xudtCellsByTypeId(
+    """distinct select on columns"""
+    distinct_on: [xudt_cell_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [xudt_cell_order_by!]
+
+    """filter the rows returned"""
+    where: xudt_cell_bool_exp
+  ): [xudt_cell!]!
+
+  """An array relationship"""
+  xudt_cells(
+    """distinct select on columns"""
+    distinct_on: [xudt_cell_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [xudt_cell_order_by!]
+
+    """filter the rows returned"""
+    where: xudt_cell_bool_exp
+  ): [xudt_cell!]!
+}
+
+"""
+Boolean expression to filter rows from the table "addresses". All fields are combined with a logical 'AND'.
+"""
+input addresses_bool_exp {
+  _and: [addresses_bool_exp!]
+  _not: addresses_bool_exp
+  _or: [addresses_bool_exp!]
+  clusters: clusters_bool_exp
+  clustersByTypeId: clusters_bool_exp
+  id: String_comparison_exp
+  inscription_info: token_info_bool_exp
+  script_args: bytea_comparison_exp
+  script_code_hash: bytea_comparison_exp
+  script_hash_type: smallint_comparison_exp
+  sporeActionsByToAddressId: spore_actions_bool_exp
+  spore_actions: spore_actions_bool_exp
+  spores: spores_bool_exp
+  sporesByTypeId: spores_bool_exp
+  token_info: token_info_bool_exp
+  token_infos: token_info_bool_exp
+  xudtCellsByTypeId: xudt_cell_bool_exp
+  xudt_cells: xudt_cell_bool_exp
+}
+
+"""Ordering options when selecting data from "addresses"."""
+input addresses_order_by {
+  clustersByTypeId_aggregate: clusters_aggregate_order_by
+  clusters_aggregate: clusters_aggregate_order_by
+  id: order_by
+  inscription_info: token_info_order_by
+  script_args: order_by
+  script_code_hash: order_by
+  script_hash_type: order_by
+  sporeActionsByToAddressId_aggregate: spore_actions_aggregate_order_by
+  spore_actions_aggregate: spore_actions_aggregate_order_by
+  sporesByTypeId_aggregate: spores_aggregate_order_by
+  spores_aggregate: spores_aggregate_order_by
+  token_info: token_info_order_by
+  token_infos_aggregate: token_info_aggregate_order_by
+  xudtCellsByTypeId_aggregate: xudt_cell_aggregate_order_by
+  xudt_cells_aggregate: xudt_cell_aggregate_order_by
+}
+
+"""
+select columns of table "addresses"
+"""
+enum addresses_select_column {
+  """column name"""
+  id
+
+  """column name"""
+  script_args
+
+  """column name"""
+  script_code_hash
+
+  """column name"""
+  script_hash_type
+}
+
+"""
+Streaming cursor of the table "addresses"
+"""
+input addresses_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: addresses_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input addresses_stream_cursor_value_input {
+  """Unique identifier for the address, typically a string representation."""
+  id: String
+
+  """Arguments passed to the script."""
+  script_args: bytea
+
+  """The code hash of the script associated with this address."""
+  script_code_hash: bytea
+
+  """The hash type of the script, indicating how the script is interpreted."""
+  script_hash_type: smallint
+}
+
+scalar bigint
+
+"""
+Boolean expression to compare columns of type "bigint". All fields are combined with logical 'AND'.
+"""
+input bigint_comparison_exp {
+  _eq: bigint
+  _gt: bigint
+  _gte: bigint
+  _in: [bigint!]
+  _is_null: Boolean
+  _lt: bigint
+  _lte: bigint
+  _neq: bigint
+  _nin: [bigint!]
+}
+
+"""
+Maintains the record of the current block height processed by the indexer, ensuring synchronization with the blockchain's progression.
+"""
+type block_height {
+  """The latest block height processed by the indexer."""
+  height: bigint!
+
+  """Primary key, should always be 1 due to the single-row constraint."""
+  id: Int!
+}
+
+"""
+Boolean expression to filter rows from the table "block_height". All fields are combined with a logical 'AND'.
+"""
+input block_height_bool_exp {
+  _and: [block_height_bool_exp!]
+  _not: block_height_bool_exp
+  _or: [block_height_bool_exp!]
+  height: bigint_comparison_exp
+  id: Int_comparison_exp
+}
+
+"""Ordering options when selecting data from "block_height"."""
+input block_height_order_by {
+  height: order_by
+  id: order_by
+}
+
+"""
+select columns of table "block_height"
+"""
+enum block_height_select_column {
+  """column name"""
+  height
+
+  """column name"""
+  id
+}
+
+"""
+Streaming cursor of the table "block_height"
+"""
+input block_height_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: block_height_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input block_height_stream_cursor_value_input {
+  """The latest block height processed by the indexer."""
+  height: bigint
+
+  """Primary key, should always be 1 due to the single-row constraint."""
+  id: Int
+}
+
+scalar bytea
+
+"""
+Boolean expression to compare columns of type "bytea". All fields are combined with logical 'AND'.
+"""
+input bytea_comparison_exp {
+  _eq: bytea
+  _gt: bytea
+  _gte: bytea
+  _in: [bytea!]
+  _is_null: Boolean
+  _lt: bytea
+  _lte: bytea
+  _neq: bytea
+  _nin: [bytea!]
+}
+
+"""
+Tracks cluster information for Spore assets, including their names, descriptions, mutation IDs, ownership, and burning status.
+"""
+type clusters {
+  """An object relationship"""
+  address: addresses
+
+  """An object relationship"""
+  addressByTypeId: addresses!
+
+  """Description of the cluster."""
+  cluster_description: String
+
+  """Name of the cluster."""
+  cluster_name: String
+
+  """Timestamp when the cluster was created."""
+  created_at: timestamp!
+
+  """Unique identifier for the cluster."""
+  id: bytea!
+
+  """
+  Indicates whether the cluster has been burned (transferred to a null address).
+  """
+  is_burned: Boolean!
+
+  """Identifier for mutations related to this cluster."""
+  mutant_id: bytea
+
+  """Reference to the address that owns this cluster."""
+  owner_address: String
+
+  """An array relationship"""
+  spore_actions(
+    """distinct select on columns"""
+    distinct_on: [spore_actions_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [spore_actions_order_by!]
+
+    """filter the rows returned"""
+    where: spore_actions_bool_exp
+  ): [spore_actions!]!
+
+  """An array relationship"""
+  spores(
+    """distinct select on columns"""
+    distinct_on: [spores_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [spores_order_by!]
+
+    """filter the rows returned"""
+    where: spores_bool_exp
+  ): [spores!]!
+  type_id: String!
+
+  """Timestamp when the cluster information was last updated."""
+  updated_at: timestamp!
+}
+
+"""
+order by aggregate values of table "clusters"
+"""
+input clusters_aggregate_order_by {
+  count: order_by
+  max: clusters_max_order_by
+  min: clusters_min_order_by
+}
+
+"""
+Boolean expression to filter rows from the table "clusters". All fields are combined with a logical 'AND'.
+"""
+input clusters_bool_exp {
+  _and: [clusters_bool_exp!]
+  _not: clusters_bool_exp
+  _or: [clusters_bool_exp!]
+  address: addresses_bool_exp
+  addressByTypeId: addresses_bool_exp
+  cluster_description: String_comparison_exp
+  cluster_name: String_comparison_exp
+  created_at: timestamp_comparison_exp
+  id: bytea_comparison_exp
+  is_burned: Boolean_comparison_exp
+  mutant_id: bytea_comparison_exp
+  owner_address: String_comparison_exp
+  spore_actions: spore_actions_bool_exp
+  spores: spores_bool_exp
+  type_id: String_comparison_exp
+  updated_at: timestamp_comparison_exp
+}
+
+"""
+order by max() on columns of table "clusters"
+"""
+input clusters_max_order_by {
+  """Description of the cluster."""
+  cluster_description: order_by
+
+  """Name of the cluster."""
+  cluster_name: order_by
+
+  """Timestamp when the cluster was created."""
+  created_at: order_by
+
+  """Reference to the address that owns this cluster."""
+  owner_address: order_by
+  type_id: order_by
+
+  """Timestamp when the cluster information was last updated."""
+  updated_at: order_by
+}
+
+"""
+order by min() on columns of table "clusters"
+"""
+input clusters_min_order_by {
+  """Description of the cluster."""
+  cluster_description: order_by
+
+  """Name of the cluster."""
+  cluster_name: order_by
+
+  """Timestamp when the cluster was created."""
+  created_at: order_by
+
+  """Reference to the address that owns this cluster."""
+  owner_address: order_by
+  type_id: order_by
+
+  """Timestamp when the cluster information was last updated."""
+  updated_at: order_by
+}
+
+"""Ordering options when selecting data from "clusters"."""
+input clusters_order_by {
+  address: addresses_order_by
+  addressByTypeId: addresses_order_by
+  cluster_description: order_by
+  cluster_name: order_by
+  created_at: order_by
+  id: order_by
+  is_burned: order_by
+  mutant_id: order_by
+  owner_address: order_by
+  spore_actions_aggregate: spore_actions_aggregate_order_by
+  spores_aggregate: spores_aggregate_order_by
+  type_id: order_by
+  updated_at: order_by
+}
+
+"""
+select columns of table "clusters"
+"""
+enum clusters_select_column {
+  """column name"""
+  cluster_description
+
+  """column name"""
+  cluster_name
+
+  """column name"""
+  created_at
+
+  """column name"""
+  id
+
+  """column name"""
+  is_burned
+
+  """column name"""
+  mutant_id
+
+  """column name"""
+  owner_address
+
+  """column name"""
+  type_id
+
+  """column name"""
+  updated_at
+}
+
+"""
+Streaming cursor of the table "clusters"
+"""
+input clusters_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: clusters_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input clusters_stream_cursor_value_input {
+  """Description of the cluster."""
+  cluster_description: String
+
+  """Name of the cluster."""
+  cluster_name: String
+
+  """Timestamp when the cluster was created."""
+  created_at: timestamp
+
+  """Unique identifier for the cluster."""
+  id: bytea
+
+  """
+  Indicates whether the cluster has been burned (transferred to a null address).
+  """
+  is_burned: Boolean
+
+  """Identifier for mutations related to this cluster."""
+  mutant_id: bytea
+
+  """Reference to the address that owns this cluster."""
+  owner_address: String
+  type_id: String
+
+  """Timestamp when the cluster information was last updated."""
+  updated_at: timestamp
+}
+
+"""ordering argument of a cursor"""
+enum cursor_ordering {
+  """ascending ordering of the cursor"""
+  ASC
+
+  """descending ordering of the cursor"""
+  DESC
+}
+
+scalar numeric
+
+"""
+Boolean expression to compare columns of type "numeric". All fields are combined with logical 'AND'.
+"""
+input numeric_comparison_exp {
+  _eq: numeric
+  _gt: numeric
+  _gte: numeric
+  _in: [numeric!]
+  _is_null: Boolean
+  _lt: numeric
+  _lte: numeric
+  _neq: numeric
+  _nin: [numeric!]
+}
+
+"""column ordering options"""
+enum order_by {
+  """in ascending order, nulls last"""
+  asc
+
+  """in ascending order, nulls first"""
+  asc_nulls_first
+
+  """in ascending order, nulls last"""
+  asc_nulls_last
+
+  """in descending order, nulls first"""
+  desc
+
+  """in descending order, nulls first"""
+  desc_nulls_first
+
+  """in descending order, nulls last"""
+  desc_nulls_last
+}
+
+type query_root {
+  """
+  fetch data from the table: "_sqlx_migrations"
+  """
+  _sqlx_migrations(
+    """distinct select on columns"""
+    distinct_on: [_sqlx_migrations_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [_sqlx_migrations_order_by!]
+
+    """filter the rows returned"""
+    where: _sqlx_migrations_bool_exp
+  ): [_sqlx_migrations!]!
+
+  """
+  fetch data from the table: "_sqlx_migrations" using primary key columns
+  """
+  _sqlx_migrations_by_pk(version: bigint!): _sqlx_migrations
+
+  """
+  fetch data from the table: "addresses"
+  """
+  addresses(
+    """distinct select on columns"""
+    distinct_on: [addresses_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [addresses_order_by!]
+
+    """filter the rows returned"""
+    where: addresses_bool_exp
+  ): [addresses!]!
+
+  """fetch data from the table: "addresses" using primary key columns"""
+  addresses_by_pk(
+    """Unique identifier for the address, typically a string representation."""
+    id: String!
+  ): addresses
+
+  """
+  fetch data from the table: "block_height"
+  """
+  block_height(
+    """distinct select on columns"""
+    distinct_on: [block_height_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [block_height_order_by!]
+
+    """filter the rows returned"""
+    where: block_height_bool_exp
+  ): [block_height!]!
+
+  """fetch data from the table: "block_height" using primary key columns"""
+  block_height_by_pk(
+    """Primary key, should always be 1 due to the single-row constraint."""
+    id: Int!
+  ): block_height
+
+  """An array relationship"""
+  clusters(
+    """distinct select on columns"""
+    distinct_on: [clusters_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [clusters_order_by!]
+
+    """filter the rows returned"""
+    where: clusters_bool_exp
+  ): [clusters!]!
+
+  """fetch data from the table: "clusters" using primary key columns"""
+  clusters_by_pk(
+    """Unique identifier for the cluster."""
+    id: bytea!
+  ): clusters
+
+  """
+  fetch data from the table: "rgbpp_locks"
+  """
+  rgbpp_locks(
+    """distinct select on columns"""
+    distinct_on: [rgbpp_locks_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [rgbpp_locks_order_by!]
+
+    """filter the rows returned"""
+    where: rgbpp_locks_bool_exp
+  ): [rgbpp_locks!]!
+
+  """fetch data from the table: "rgbpp_locks" using primary key columns"""
+  rgbpp_locks_by_pk(
+    """Unique identifier for the lock script."""
+    lock_id: bytea!
+  ): rgbpp_locks
+
+  """
+  fetch data from the table: "rgbpp_unlocks"
+  """
+  rgbpp_unlocks(
+    """distinct select on columns"""
+    distinct_on: [rgbpp_unlocks_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [rgbpp_unlocks_order_by!]
+
+    """filter the rows returned"""
+    where: rgbpp_unlocks_bool_exp
+  ): [rgbpp_unlocks!]!
+
+  """fetch data from the table: "rgbpp_unlocks" using primary key columns"""
+  rgbpp_unlocks_by_pk(
+    """Unique identifier for the unlock script."""
+    unlock_id: bytea!
+  ): rgbpp_unlocks
+
+  """An array relationship"""
+  spore_actions(
+    """distinct select on columns"""
+    distinct_on: [spore_actions_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [spore_actions_order_by!]
+
+    """filter the rows returned"""
+    where: spore_actions_bool_exp
+  ): [spore_actions!]!
+
+  """fetch data from the table: "spore_actions" using primary key columns"""
+  spore_actions_by_pk(
+    """The transaction hash that includes this action."""
+    tx: bytea!
+  ): spore_actions
+
+  """An array relationship"""
+  spores(
+    """distinct select on columns"""
+    distinct_on: [spores_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [spores_order_by!]
+
+    """filter the rows returned"""
+    where: spores_bool_exp
+  ): [spores!]!
+
+  """fetch data from the table: "spores" using primary key columns"""
+  spores_by_pk(
+    """Unique identifier for the spore."""
+    id: bytea!
+  ): spores
+
+  """
+  fetch data from the table: "token_info"
+  """
+  token_info(
+    """distinct select on columns"""
+    distinct_on: [token_info_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [token_info_order_by!]
+
+    """filter the rows returned"""
+    where: token_info_bool_exp
+  ): [token_info!]!
+
+  """fetch data from the table: "token_info" using primary key columns"""
+  token_info_by_pk(
+    """Reference to the address defining this token type."""
+    type_id: String!
+  ): token_info
+
+  """
+  fetch data from the table: "transaction_outputs_status"
+  """
+  transaction_outputs_status(
+    """distinct select on columns"""
+    distinct_on: [transaction_outputs_status_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [transaction_outputs_status_order_by!]
+
+    """filter the rows returned"""
+    where: transaction_outputs_status_bool_exp
+  ): [transaction_outputs_status!]!
+
+  """
+  fetch data from the table: "transaction_outputs_status" using primary key columns
+  """
+  transaction_outputs_status_by_pk(
+    """Hash of the transaction that produced this output."""
+    output_transaction_hash: bytea!
+
+    """Index of the output in the transaction."""
+    output_transaction_index: Int!
+  ): transaction_outputs_status
+
+  """
+  fetch data from the table: "xudt_cell"
+  """
+  xudt_cell(
+    """distinct select on columns"""
+    distinct_on: [xudt_cell_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [xudt_cell_order_by!]
+
+    """filter the rows returned"""
+    where: xudt_cell_bool_exp
+  ): [xudt_cell!]!
+
+  """fetch data from the table: "xudt_cell" using primary key columns"""
+  xudt_cell_by_pk(
+    """Hash of the transaction that includes this cell."""
+    transaction_hash: bytea!
+
+    """Index of the output in the transaction."""
+    transaction_index: Int!
+  ): xudt_cell
+}
+
+"""
+Indexes lock scripts associated with RGBPP assets, linking them to specific transaction outputs and Bitcoin transaction IDs.
+"""
+type rgbpp_locks {
+  """Bitcoin transaction ID associated with this lock."""
+  btc_txid: bytea!
+
+  """Unique identifier for the lock script."""
+  lock_id: bytea!
+
+  """Index of the output in the transaction that contains this lock."""
+  out_index: Int!
+
+  """The CKB transaction hash that includes this lock."""
+  tx: bytea!
+}
+
+"""
+Boolean expression to filter rows from the table "rgbpp_locks". All fields are combined with a logical 'AND'.
+"""
+input rgbpp_locks_bool_exp {
+  _and: [rgbpp_locks_bool_exp!]
+  _not: rgbpp_locks_bool_exp
+  _or: [rgbpp_locks_bool_exp!]
+  btc_txid: bytea_comparison_exp
+  lock_id: bytea_comparison_exp
+  out_index: Int_comparison_exp
+  tx: bytea_comparison_exp
+}
+
+"""Ordering options when selecting data from "rgbpp_locks"."""
+input rgbpp_locks_order_by {
+  btc_txid: order_by
+  lock_id: order_by
+  out_index: order_by
+  tx: order_by
+}
+
+"""
+select columns of table "rgbpp_locks"
+"""
+enum rgbpp_locks_select_column {
+  """column name"""
+  btc_txid
+
+  """column name"""
+  lock_id
+
+  """column name"""
+  out_index
+
+  """column name"""
+  tx
+}
+
+"""
+Streaming cursor of the table "rgbpp_locks"
+"""
+input rgbpp_locks_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: rgbpp_locks_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input rgbpp_locks_stream_cursor_value_input {
+  """Bitcoin transaction ID associated with this lock."""
+  btc_txid: bytea
+
+  """Unique identifier for the lock script."""
+  lock_id: bytea
+
+  """Index of the output in the transaction that contains this lock."""
+  out_index: Int
+
+  """The CKB transaction hash that includes this lock."""
+  tx: bytea
+}
+
+"""
+Records unlock scripts or conditions for spending RGBPP assets, including version information, input and output lengths, and related Bitcoin transactions and proofs.
+"""
+type rgbpp_unlocks {
+  """Bitcoin transaction data associated with this unlock."""
+  btc_tx: bytea!
+
+  """Proof verifying the Bitcoin transaction."""
+  btc_tx_proof: bytea!
+
+  """Length of inputs required by this unlock script."""
+  input_len: smallint!
+
+  """Length of outputs produced by this unlock script."""
+  output_len: smallint!
+
+  """The CKB transaction hash that includes this unlock."""
+  tx: bytea!
+
+  """Unique identifier for the unlock script."""
+  unlock_id: bytea!
+
+  """Version of the unlock script."""
+  version: smallint!
+}
+
+"""
+Boolean expression to filter rows from the table "rgbpp_unlocks". All fields are combined with a logical 'AND'.
+"""
+input rgbpp_unlocks_bool_exp {
+  _and: [rgbpp_unlocks_bool_exp!]
+  _not: rgbpp_unlocks_bool_exp
+  _or: [rgbpp_unlocks_bool_exp!]
+  btc_tx: bytea_comparison_exp
+  btc_tx_proof: bytea_comparison_exp
+  input_len: smallint_comparison_exp
+  output_len: smallint_comparison_exp
+  tx: bytea_comparison_exp
+  unlock_id: bytea_comparison_exp
+  version: smallint_comparison_exp
+}
+
+"""Ordering options when selecting data from "rgbpp_unlocks"."""
+input rgbpp_unlocks_order_by {
+  btc_tx: order_by
+  btc_tx_proof: order_by
+  input_len: order_by
+  output_len: order_by
+  tx: order_by
+  unlock_id: order_by
+  version: order_by
+}
+
+"""
+select columns of table "rgbpp_unlocks"
+"""
+enum rgbpp_unlocks_select_column {
+  """column name"""
+  btc_tx
+
+  """column name"""
+  btc_tx_proof
+
+  """column name"""
+  input_len
+
+  """column name"""
+  output_len
+
+  """column name"""
+  tx
+
+  """column name"""
+  unlock_id
+
+  """column name"""
+  version
+}
+
+"""
+Streaming cursor of the table "rgbpp_unlocks"
+"""
+input rgbpp_unlocks_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: rgbpp_unlocks_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input rgbpp_unlocks_stream_cursor_value_input {
+  """Bitcoin transaction data associated with this unlock."""
+  btc_tx: bytea
+
+  """Proof verifying the Bitcoin transaction."""
+  btc_tx_proof: bytea
+
+  """Length of inputs required by this unlock script."""
+  input_len: smallint
+
+  """Length of outputs produced by this unlock script."""
+  output_len: smallint
+
+  """The CKB transaction hash that includes this unlock."""
+  tx: bytea
+
+  """Unique identifier for the unlock script."""
+  unlock_id: bytea
+
+  """Version of the unlock script."""
+  version: smallint
+}
+
+scalar smallint
+
+"""
+Boolean expression to compare columns of type "smallint". All fields are combined with logical 'AND'.
+"""
+input smallint_comparison_exp {
+  _eq: smallint
+  _gt: smallint
+  _gte: smallint
+  _in: [smallint!]
+  _is_null: Boolean
+  _lt: smallint
+  _lte: smallint
+  _neq: smallint
+  _nin: [smallint!]
+}
+
+scalar spore_action_type
+
+"""
+Boolean expression to compare columns of type "spore_action_type". All fields are combined with logical 'AND'.
+"""
+input spore_action_type_comparison_exp {
+  _eq: spore_action_type
+  _gt: spore_action_type
+  _gte: spore_action_type
+  _in: [spore_action_type!]
+  _is_null: Boolean
+  _lt: spore_action_type
+  _lte: spore_action_type
+  _neq: spore_action_type
+  _nin: [spore_action_type!]
+}
+
+"""
+Records transactional actions performed on Spore or Cluster assets, such as minting, transferring, or burning.
+"""
+type spore_actions {
+  """Type of action performed (e.g., MintSpore, TransferCluster)."""
+  action_type: spore_action_type!
+
+  """An object relationship"""
+  address: addresses
+
+  """An object relationship"""
+  addressByToAddressId: addresses
+
+  """An object relationship"""
+  cluster: clusters
+
+  """Reference to the Cluster involved in this action, if applicable."""
+  cluster_id: bytea
+
+  """Timestamp when this action occurred."""
+  created_at: timestamp!
+
+  """Hash of additional data related to this action."""
+  data_hash: bytea
+
+  """Reference to the address from which the asset was transferred."""
+  from_address_id: String
+
+  """Identifier for proxy-related actions."""
+  proxy_id: bytea
+
+  """An object relationship"""
+  spore: spores
+
+  """Reference to the Spore involved in this action, if applicable."""
+  spore_id: bytea
+
+  """Reference to the address to which the asset was transferred."""
+  to_address_id: String
+
+  """The transaction hash that includes this action."""
+  tx: bytea!
+}
+
+"""
+order by aggregate values of table "spore_actions"
+"""
+input spore_actions_aggregate_order_by {
+  count: order_by
+  max: spore_actions_max_order_by
+  min: spore_actions_min_order_by
+}
+
+"""
+Boolean expression to filter rows from the table "spore_actions". All fields are combined with a logical 'AND'.
+"""
+input spore_actions_bool_exp {
+  _and: [spore_actions_bool_exp!]
+  _not: spore_actions_bool_exp
+  _or: [spore_actions_bool_exp!]
+  action_type: spore_action_type_comparison_exp
+  address: addresses_bool_exp
+  addressByToAddressId: addresses_bool_exp
+  cluster: clusters_bool_exp
+  cluster_id: bytea_comparison_exp
+  created_at: timestamp_comparison_exp
+  data_hash: bytea_comparison_exp
+  from_address_id: String_comparison_exp
+  proxy_id: bytea_comparison_exp
+  spore: spores_bool_exp
+  spore_id: bytea_comparison_exp
+  to_address_id: String_comparison_exp
+  tx: bytea_comparison_exp
+}
+
+"""
+order by max() on columns of table "spore_actions"
+"""
+input spore_actions_max_order_by {
+  """Type of action performed (e.g., MintSpore, TransferCluster)."""
+  action_type: order_by
+
+  """Timestamp when this action occurred."""
+  created_at: order_by
+
+  """Reference to the address from which the asset was transferred."""
+  from_address_id: order_by
+
+  """Reference to the address to which the asset was transferred."""
+  to_address_id: order_by
+}
+
+"""
+order by min() on columns of table "spore_actions"
+"""
+input spore_actions_min_order_by {
+  """Type of action performed (e.g., MintSpore, TransferCluster)."""
+  action_type: order_by
+
+  """Timestamp when this action occurred."""
+  created_at: order_by
+
+  """Reference to the address from which the asset was transferred."""
+  from_address_id: order_by
+
+  """Reference to the address to which the asset was transferred."""
+  to_address_id: order_by
+}
+
+"""Ordering options when selecting data from "spore_actions"."""
+input spore_actions_order_by {
+  action_type: order_by
+  address: addresses_order_by
+  addressByToAddressId: addresses_order_by
+  cluster: clusters_order_by
+  cluster_id: order_by
+  created_at: order_by
+  data_hash: order_by
+  from_address_id: order_by
+  proxy_id: order_by
+  spore: spores_order_by
+  spore_id: order_by
+  to_address_id: order_by
+  tx: order_by
+}
+
+"""
+select columns of table "spore_actions"
+"""
+enum spore_actions_select_column {
+  """column name"""
+  action_type
+
+  """column name"""
+  cluster_id
+
+  """column name"""
+  created_at
+
+  """column name"""
+  data_hash
+
+  """column name"""
+  from_address_id
+
+  """column name"""
+  proxy_id
+
+  """column name"""
+  spore_id
+
+  """column name"""
+  to_address_id
+
+  """column name"""
+  tx
+}
+
+"""
+Streaming cursor of the table "spore_actions"
+"""
+input spore_actions_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: spore_actions_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input spore_actions_stream_cursor_value_input {
+  """Type of action performed (e.g., MintSpore, TransferCluster)."""
+  action_type: spore_action_type
+
+  """Reference to the Cluster involved in this action, if applicable."""
+  cluster_id: bytea
+
+  """Timestamp when this action occurred."""
+  created_at: timestamp
+
+  """Hash of additional data related to this action."""
+  data_hash: bytea
+
+  """Reference to the address from which the asset was transferred."""
+  from_address_id: String
+
+  """Identifier for proxy-related actions."""
+  proxy_id: bytea
+
+  """Reference to the Spore involved in this action, if applicable."""
+  spore_id: bytea
+
+  """Reference to the address to which the asset was transferred."""
+  to_address_id: String
+
+  """The transaction hash that includes this action."""
+  tx: bytea
+}
+
+"""
+Holds details about individual Spore assets, including their type, content, associated cluster, owner, and burning status.
+"""
+type spores {
+  """An object relationship"""
+  address: addresses
+
+  """An object relationship"""
+  addressByTypeId: addresses!
+
+  """An object relationship"""
+  cluster: clusters
+
+  """Reference to the cluster this spore belongs to."""
+  cluster_id: bytea
+
+  """The actual content data of the spore."""
+  content: bytea
+
+  """Type of content associated with the spore (e.g., text, image)."""
+  content_type: String
+
+  """Timestamp when the spore was created."""
+  created_at: timestamp!
+
+  """Unique identifier for the spore."""
+  id: bytea!
+
+  """Indicates whether the spore has been burned."""
+  is_burned: Boolean!
+
+  """Reference to the address that owns this spore."""
+  owner_address: String
+
+  """An array relationship"""
+  spore_actions(
+    """distinct select on columns"""
+    distinct_on: [spore_actions_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [spore_actions_order_by!]
+
+    """filter the rows returned"""
+    where: spore_actions_bool_exp
+  ): [spore_actions!]!
+  type_id: String!
+
+  """Timestamp when the spore information was last updated."""
+  updated_at: timestamp!
+}
+
+"""
+order by aggregate values of table "spores"
+"""
+input spores_aggregate_order_by {
+  count: order_by
+  max: spores_max_order_by
+  min: spores_min_order_by
+}
+
+"""
+Boolean expression to filter rows from the table "spores". All fields are combined with a logical 'AND'.
+"""
+input spores_bool_exp {
+  _and: [spores_bool_exp!]
+  _not: spores_bool_exp
+  _or: [spores_bool_exp!]
+  address: addresses_bool_exp
+  addressByTypeId: addresses_bool_exp
+  cluster: clusters_bool_exp
+  cluster_id: bytea_comparison_exp
+  content: bytea_comparison_exp
+  content_type: String_comparison_exp
+  created_at: timestamp_comparison_exp
+  id: bytea_comparison_exp
+  is_burned: Boolean_comparison_exp
+  owner_address: String_comparison_exp
+  spore_actions: spore_actions_bool_exp
+  type_id: String_comparison_exp
+  updated_at: timestamp_comparison_exp
+}
+
+"""
+order by max() on columns of table "spores"
+"""
+input spores_max_order_by {
+  """Type of content associated with the spore (e.g., text, image)."""
+  content_type: order_by
+
+  """Timestamp when the spore was created."""
+  created_at: order_by
+
+  """Reference to the address that owns this spore."""
+  owner_address: order_by
+  type_id: order_by
+
+  """Timestamp when the spore information was last updated."""
+  updated_at: order_by
+}
+
+"""
+order by min() on columns of table "spores"
+"""
+input spores_min_order_by {
+  """Type of content associated with the spore (e.g., text, image)."""
+  content_type: order_by
+
+  """Timestamp when the spore was created."""
+  created_at: order_by
+
+  """Reference to the address that owns this spore."""
+  owner_address: order_by
+  type_id: order_by
+
+  """Timestamp when the spore information was last updated."""
+  updated_at: order_by
+}
+
+"""Ordering options when selecting data from "spores"."""
+input spores_order_by {
+  address: addresses_order_by
+  addressByTypeId: addresses_order_by
+  cluster: clusters_order_by
+  cluster_id: order_by
+  content: order_by
+  content_type: order_by
+  created_at: order_by
+  id: order_by
+  is_burned: order_by
+  owner_address: order_by
+  spore_actions_aggregate: spore_actions_aggregate_order_by
+  type_id: order_by
+  updated_at: order_by
+}
+
+"""
+select columns of table "spores"
+"""
+enum spores_select_column {
+  """column name"""
+  cluster_id
+
+  """column name"""
+  content
+
+  """column name"""
+  content_type
+
+  """column name"""
+  created_at
+
+  """column name"""
+  id
+
+  """column name"""
+  is_burned
+
+  """column name"""
+  owner_address
+
+  """column name"""
+  type_id
+
+  """column name"""
+  updated_at
+}
+
+"""
+Streaming cursor of the table "spores"
+"""
+input spores_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: spores_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input spores_stream_cursor_value_input {
+  """Reference to the cluster this spore belongs to."""
+  cluster_id: bytea
+
+  """The actual content data of the spore."""
+  content: bytea
+
+  """Type of content associated with the spore (e.g., text, image)."""
+  content_type: String
+
+  """Timestamp when the spore was created."""
+  created_at: timestamp
+
+  """Unique identifier for the spore."""
+  id: bytea
+
+  """Indicates whether the spore has been burned."""
+  is_burned: Boolean
+
+  """Reference to the address that owns this spore."""
+  owner_address: String
+  type_id: String
+
+  """Timestamp when the spore information was last updated."""
+  updated_at: timestamp
+}
+
+type subscription_root {
+  """
+  fetch data from the table: "_sqlx_migrations"
+  """
+  _sqlx_migrations(
+    """distinct select on columns"""
+    distinct_on: [_sqlx_migrations_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [_sqlx_migrations_order_by!]
+
+    """filter the rows returned"""
+    where: _sqlx_migrations_bool_exp
+  ): [_sqlx_migrations!]!
+
+  """
+  fetch data from the table: "_sqlx_migrations" using primary key columns
+  """
+  _sqlx_migrations_by_pk(version: bigint!): _sqlx_migrations
+
+  """
+  fetch data from the table in a streaming manner: "_sqlx_migrations"
+  """
+  _sqlx_migrations_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [_sqlx_migrations_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: _sqlx_migrations_bool_exp
+  ): [_sqlx_migrations!]!
+
+  """
+  fetch data from the table: "addresses"
+  """
+  addresses(
+    """distinct select on columns"""
+    distinct_on: [addresses_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [addresses_order_by!]
+
+    """filter the rows returned"""
+    where: addresses_bool_exp
+  ): [addresses!]!
+
+  """fetch data from the table: "addresses" using primary key columns"""
+  addresses_by_pk(
+    """Unique identifier for the address, typically a string representation."""
+    id: String!
+  ): addresses
+
+  """
+  fetch data from the table in a streaming manner: "addresses"
+  """
+  addresses_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [addresses_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: addresses_bool_exp
+  ): [addresses!]!
+
+  """
+  fetch data from the table: "block_height"
+  """
+  block_height(
+    """distinct select on columns"""
+    distinct_on: [block_height_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [block_height_order_by!]
+
+    """filter the rows returned"""
+    where: block_height_bool_exp
+  ): [block_height!]!
+
+  """fetch data from the table: "block_height" using primary key columns"""
+  block_height_by_pk(
+    """Primary key, should always be 1 due to the single-row constraint."""
+    id: Int!
+  ): block_height
+
+  """
+  fetch data from the table in a streaming manner: "block_height"
+  """
+  block_height_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [block_height_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: block_height_bool_exp
+  ): [block_height!]!
+
+  """An array relationship"""
+  clusters(
+    """distinct select on columns"""
+    distinct_on: [clusters_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [clusters_order_by!]
+
+    """filter the rows returned"""
+    where: clusters_bool_exp
+  ): [clusters!]!
+
+  """fetch data from the table: "clusters" using primary key columns"""
+  clusters_by_pk(
+    """Unique identifier for the cluster."""
+    id: bytea!
+  ): clusters
+
+  """
+  fetch data from the table in a streaming manner: "clusters"
+  """
+  clusters_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [clusters_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: clusters_bool_exp
+  ): [clusters!]!
+
+  """
+  fetch data from the table: "rgbpp_locks"
+  """
+  rgbpp_locks(
+    """distinct select on columns"""
+    distinct_on: [rgbpp_locks_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [rgbpp_locks_order_by!]
+
+    """filter the rows returned"""
+    where: rgbpp_locks_bool_exp
+  ): [rgbpp_locks!]!
+
+  """fetch data from the table: "rgbpp_locks" using primary key columns"""
+  rgbpp_locks_by_pk(
+    """Unique identifier for the lock script."""
+    lock_id: bytea!
+  ): rgbpp_locks
+
+  """
+  fetch data from the table in a streaming manner: "rgbpp_locks"
+  """
+  rgbpp_locks_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [rgbpp_locks_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: rgbpp_locks_bool_exp
+  ): [rgbpp_locks!]!
+
+  """
+  fetch data from the table: "rgbpp_unlocks"
+  """
+  rgbpp_unlocks(
+    """distinct select on columns"""
+    distinct_on: [rgbpp_unlocks_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [rgbpp_unlocks_order_by!]
+
+    """filter the rows returned"""
+    where: rgbpp_unlocks_bool_exp
+  ): [rgbpp_unlocks!]!
+
+  """fetch data from the table: "rgbpp_unlocks" using primary key columns"""
+  rgbpp_unlocks_by_pk(
+    """Unique identifier for the unlock script."""
+    unlock_id: bytea!
+  ): rgbpp_unlocks
+
+  """
+  fetch data from the table in a streaming manner: "rgbpp_unlocks"
+  """
+  rgbpp_unlocks_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [rgbpp_unlocks_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: rgbpp_unlocks_bool_exp
+  ): [rgbpp_unlocks!]!
+
+  """An array relationship"""
+  spore_actions(
+    """distinct select on columns"""
+    distinct_on: [spore_actions_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [spore_actions_order_by!]
+
+    """filter the rows returned"""
+    where: spore_actions_bool_exp
+  ): [spore_actions!]!
+
+  """fetch data from the table: "spore_actions" using primary key columns"""
+  spore_actions_by_pk(
+    """The transaction hash that includes this action."""
+    tx: bytea!
+  ): spore_actions
+
+  """
+  fetch data from the table in a streaming manner: "spore_actions"
+  """
+  spore_actions_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [spore_actions_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: spore_actions_bool_exp
+  ): [spore_actions!]!
+
+  """An array relationship"""
+  spores(
+    """distinct select on columns"""
+    distinct_on: [spores_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [spores_order_by!]
+
+    """filter the rows returned"""
+    where: spores_bool_exp
+  ): [spores!]!
+
+  """fetch data from the table: "spores" using primary key columns"""
+  spores_by_pk(
+    """Unique identifier for the spore."""
+    id: bytea!
+  ): spores
+
+  """
+  fetch data from the table in a streaming manner: "spores"
+  """
+  spores_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [spores_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: spores_bool_exp
+  ): [spores!]!
+
+  """
+  fetch data from the table: "token_info"
+  """
+  token_info(
+    """distinct select on columns"""
+    distinct_on: [token_info_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [token_info_order_by!]
+
+    """filter the rows returned"""
+    where: token_info_bool_exp
+  ): [token_info!]!
+
+  """fetch data from the table: "token_info" using primary key columns"""
+  token_info_by_pk(
+    """Reference to the address defining this token type."""
+    type_id: String!
+  ): token_info
+
+  """
+  fetch data from the table in a streaming manner: "token_info"
+  """
+  token_info_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [token_info_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: token_info_bool_exp
+  ): [token_info!]!
+
+  """
+  fetch data from the table: "transaction_outputs_status"
+  """
+  transaction_outputs_status(
+    """distinct select on columns"""
+    distinct_on: [transaction_outputs_status_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [transaction_outputs_status_order_by!]
+
+    """filter the rows returned"""
+    where: transaction_outputs_status_bool_exp
+  ): [transaction_outputs_status!]!
+
+  """
+  fetch data from the table: "transaction_outputs_status" using primary key columns
+  """
+  transaction_outputs_status_by_pk(
+    """Hash of the transaction that produced this output."""
+    output_transaction_hash: bytea!
+
+    """Index of the output in the transaction."""
+    output_transaction_index: Int!
+  ): transaction_outputs_status
+
+  """
+  fetch data from the table in a streaming manner: "transaction_outputs_status"
+  """
+  transaction_outputs_status_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [transaction_outputs_status_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: transaction_outputs_status_bool_exp
+  ): [transaction_outputs_status!]!
+
+  """
+  fetch data from the table: "xudt_cell"
+  """
+  xudt_cell(
+    """distinct select on columns"""
+    distinct_on: [xudt_cell_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [xudt_cell_order_by!]
+
+    """filter the rows returned"""
+    where: xudt_cell_bool_exp
+  ): [xudt_cell!]!
+
+  """fetch data from the table: "xudt_cell" using primary key columns"""
+  xudt_cell_by_pk(
+    """Hash of the transaction that includes this cell."""
+    transaction_hash: bytea!
+
+    """Index of the output in the transaction."""
+    transaction_index: Int!
+  ): xudt_cell
+
+  """
+  fetch data from the table in a streaming manner: "xudt_cell"
+  """
+  xudt_cell_stream(
+    """maximum number of rows returned in a single batch"""
+    batch_size: Int!
+
+    """cursor to stream the results returned by the query"""
+    cursor: [xudt_cell_stream_cursor_input]!
+
+    """filter the rows returned"""
+    where: xudt_cell_bool_exp
+  ): [xudt_cell!]!
+}
+
+scalar timestamp
+
+"""
+Boolean expression to compare columns of type "timestamp". All fields are combined with logical 'AND'.
+"""
+input timestamp_comparison_exp {
+  _eq: timestamp
+  _gt: timestamp
+  _gte: timestamp
+  _in: [timestamp!]
+  _is_null: Boolean
+  _lt: timestamp
+  _lte: timestamp
+  _neq: timestamp
+  _nin: [timestamp!]
+}
+
+scalar timestamptz
+
+"""
+Boolean expression to compare columns of type "timestamptz". All fields are combined with logical 'AND'.
+"""
+input timestamptz_comparison_exp {
+  _eq: timestamptz
+  _gt: timestamptz
+  _gte: timestamptz
+  _in: [timestamptz!]
+  _is_null: Boolean
+  _lt: timestamptz
+  _lte: timestamptz
+  _neq: timestamptz
+  _nin: [timestamptz!]
+}
+
+"""
+Holds essential information about token definitions, aiding in the identification and tracking of different token types within the blockchain.
+"""
+type token_info {
+  """An object relationship"""
+  address: addresses!
+
+  """An object relationship"""
+  addressByInscriptionId: addresses
+
+  """Number of decimal places for the token."""
+  decimal: smallint!
+
+  """Expected total supply of the token."""
+  expected_supply: numeric
+  inscription_id: String
+
+  """Limit on the amount that can be minted."""
+  mint_limit: numeric
+
+  """Status indicating the current minting situation."""
+  mint_status: smallint
+
+  """Name of the token."""
+  name: String!
+
+  """Symbol or shorthand for the token name."""
+  symbol: String!
+
+  """
+  Hash of the transaction that defined or updated this token information.
+  """
+  transaction_hash: bytea!
+
+  """
+  Index of the output in the transaction that contains this token definition.
+  """
+  transaction_index: Int!
+
+  """Reference to the address defining this token type."""
+  type_id: String!
+
+  """Hash of the UDT (User-Defined Token) contract, if applicable."""
+  udt_hash: bytea
+}
+
+"""
+order by aggregate values of table "token_info"
+"""
+input token_info_aggregate_order_by {
+  avg: token_info_avg_order_by
+  count: order_by
+  max: token_info_max_order_by
+  min: token_info_min_order_by
+  stddev: token_info_stddev_order_by
+  stddev_pop: token_info_stddev_pop_order_by
+  stddev_samp: token_info_stddev_samp_order_by
+  sum: token_info_sum_order_by
+  var_pop: token_info_var_pop_order_by
+  var_samp: token_info_var_samp_order_by
+  variance: token_info_variance_order_by
+}
+
+"""
+order by avg() on columns of table "token_info"
+"""
+input token_info_avg_order_by {
+  """Number of decimal places for the token."""
+  decimal: order_by
+
+  """Expected total supply of the token."""
+  expected_supply: order_by
+
+  """Limit on the amount that can be minted."""
+  mint_limit: order_by
+
+  """Status indicating the current minting situation."""
+  mint_status: order_by
+
+  """
+  Index of the output in the transaction that contains this token definition.
+  """
+  transaction_index: order_by
+}
+
+"""
+Boolean expression to filter rows from the table "token_info". All fields are combined with a logical 'AND'.
+"""
+input token_info_bool_exp {
+  _and: [token_info_bool_exp!]
+  _not: token_info_bool_exp
+  _or: [token_info_bool_exp!]
+  address: addresses_bool_exp
+  addressByInscriptionId: addresses_bool_exp
+  decimal: smallint_comparison_exp
+  expected_supply: numeric_comparison_exp
+  inscription_id: String_comparison_exp
+  mint_limit: numeric_comparison_exp
+  mint_status: smallint_comparison_exp
+  name: String_comparison_exp
+  symbol: String_comparison_exp
+  transaction_hash: bytea_comparison_exp
+  transaction_index: Int_comparison_exp
+  type_id: String_comparison_exp
+  udt_hash: bytea_comparison_exp
+}
+
+"""
+order by max() on columns of table "token_info"
+"""
+input token_info_max_order_by {
+  """Number of decimal places for the token."""
+  decimal: order_by
+
+  """Expected total supply of the token."""
+  expected_supply: order_by
+  inscription_id: order_by
+
+  """Limit on the amount that can be minted."""
+  mint_limit: order_by
+
+  """Status indicating the current minting situation."""
+  mint_status: order_by
+
+  """Name of the token."""
+  name: order_by
+
+  """Symbol or shorthand for the token name."""
+  symbol: order_by
+
+  """
+  Index of the output in the transaction that contains this token definition.
+  """
+  transaction_index: order_by
+
+  """Reference to the address defining this token type."""
+  type_id: order_by
+}
+
+"""
+order by min() on columns of table "token_info"
+"""
+input token_info_min_order_by {
+  """Number of decimal places for the token."""
+  decimal: order_by
+
+  """Expected total supply of the token."""
+  expected_supply: order_by
+  inscription_id: order_by
+
+  """Limit on the amount that can be minted."""
+  mint_limit: order_by
+
+  """Status indicating the current minting situation."""
+  mint_status: order_by
+
+  """Name of the token."""
+  name: order_by
+
+  """Symbol or shorthand for the token name."""
+  symbol: order_by
+
+  """
+  Index of the output in the transaction that contains this token definition.
+  """
+  transaction_index: order_by
+
+  """Reference to the address defining this token type."""
+  type_id: order_by
+}
+
+"""Ordering options when selecting data from "token_info"."""
+input token_info_order_by {
+  address: addresses_order_by
+  addressByInscriptionId: addresses_order_by
+  decimal: order_by
+  expected_supply: order_by
+  inscription_id: order_by
+  mint_limit: order_by
+  mint_status: order_by
+  name: order_by
+  symbol: order_by
+  transaction_hash: order_by
+  transaction_index: order_by
+  type_id: order_by
+  udt_hash: order_by
+}
+
+"""
+select columns of table "token_info"
+"""
+enum token_info_select_column {
+  """column name"""
+  decimal
+
+  """column name"""
+  expected_supply
+
+  """column name"""
+  inscription_id
+
+  """column name"""
+  mint_limit
+
+  """column name"""
+  mint_status
+
+  """column name"""
+  name
+
+  """column name"""
+  symbol
+
+  """column name"""
+  transaction_hash
+
+  """column name"""
+  transaction_index
+
+  """column name"""
+  type_id
+
+  """column name"""
+  udt_hash
+}
+
+"""
+order by stddev() on columns of table "token_info"
+"""
+input token_info_stddev_order_by {
+  """Number of decimal places for the token."""
+  decimal: order_by
+
+  """Expected total supply of the token."""
+  expected_supply: order_by
+
+  """Limit on the amount that can be minted."""
+  mint_limit: order_by
+
+  """Status indicating the current minting situation."""
+  mint_status: order_by
+
+  """
+  Index of the output in the transaction that contains this token definition.
+  """
+  transaction_index: order_by
+}
+
+"""
+order by stddev_pop() on columns of table "token_info"
+"""
+input token_info_stddev_pop_order_by {
+  """Number of decimal places for the token."""
+  decimal: order_by
+
+  """Expected total supply of the token."""
+  expected_supply: order_by
+
+  """Limit on the amount that can be minted."""
+  mint_limit: order_by
+
+  """Status indicating the current minting situation."""
+  mint_status: order_by
+
+  """
+  Index of the output in the transaction that contains this token definition.
+  """
+  transaction_index: order_by
+}
+
+"""
+order by stddev_samp() on columns of table "token_info"
+"""
+input token_info_stddev_samp_order_by {
+  """Number of decimal places for the token."""
+  decimal: order_by
+
+  """Expected total supply of the token."""
+  expected_supply: order_by
+
+  """Limit on the amount that can be minted."""
+  mint_limit: order_by
+
+  """Status indicating the current minting situation."""
+  mint_status: order_by
+
+  """
+  Index of the output in the transaction that contains this token definition.
+  """
+  transaction_index: order_by
+}
+
+"""
+Streaming cursor of the table "token_info"
+"""
+input token_info_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: token_info_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input token_info_stream_cursor_value_input {
+  """Number of decimal places for the token."""
+  decimal: smallint
+
+  """Expected total supply of the token."""
+  expected_supply: numeric
+  inscription_id: String
+
+  """Limit on the amount that can be minted."""
+  mint_limit: numeric
+
+  """Status indicating the current minting situation."""
+  mint_status: smallint
+
+  """Name of the token."""
+  name: String
+
+  """Symbol or shorthand for the token name."""
+  symbol: String
+
+  """
+  Hash of the transaction that defined or updated this token information.
+  """
+  transaction_hash: bytea
+
+  """
+  Index of the output in the transaction that contains this token definition.
+  """
+  transaction_index: Int
+
+  """Reference to the address defining this token type."""
+  type_id: String
+
+  """Hash of the UDT (User-Defined Token) contract, if applicable."""
+  udt_hash: bytea
+}
+
+"""
+order by sum() on columns of table "token_info"
+"""
+input token_info_sum_order_by {
+  """Number of decimal places for the token."""
+  decimal: order_by
+
+  """Expected total supply of the token."""
+  expected_supply: order_by
+
+  """Limit on the amount that can be minted."""
+  mint_limit: order_by
+
+  """Status indicating the current minting situation."""
+  mint_status: order_by
+
+  """
+  Index of the output in the transaction that contains this token definition.
+  """
+  transaction_index: order_by
+}
+
+"""
+order by var_pop() on columns of table "token_info"
+"""
+input token_info_var_pop_order_by {
+  """Number of decimal places for the token."""
+  decimal: order_by
+
+  """Expected total supply of the token."""
+  expected_supply: order_by
+
+  """Limit on the amount that can be minted."""
+  mint_limit: order_by
+
+  """Status indicating the current minting situation."""
+  mint_status: order_by
+
+  """
+  Index of the output in the transaction that contains this token definition.
+  """
+  transaction_index: order_by
+}
+
+"""
+order by var_samp() on columns of table "token_info"
+"""
+input token_info_var_samp_order_by {
+  """Number of decimal places for the token."""
+  decimal: order_by
+
+  """Expected total supply of the token."""
+  expected_supply: order_by
+
+  """Limit on the amount that can be minted."""
+  mint_limit: order_by
+
+  """Status indicating the current minting situation."""
+  mint_status: order_by
+
+  """
+  Index of the output in the transaction that contains this token definition.
+  """
+  transaction_index: order_by
+}
+
+"""
+order by variance() on columns of table "token_info"
+"""
+input token_info_variance_order_by {
+  """Number of decimal places for the token."""
+  decimal: order_by
+
+  """Expected total supply of the token."""
+  expected_supply: order_by
+
+  """Limit on the amount that can be minted."""
+  mint_limit: order_by
+
+  """Status indicating the current minting situation."""
+  mint_status: order_by
+
+  """
+  Index of the output in the transaction that contains this token definition.
+  """
+  transaction_index: order_by
+}
+
+"""
+Tracks the consumption status of transaction outputs, indicating whether they have been spent in subsequent transactions.
+"""
+type transaction_outputs_status {
+  """Hash of the transaction that consumed this output, if applicable."""
+  consumed_input_transaction_hash: bytea
+
+  """
+  Index of the input in the consuming transaction that spent this output.
+  """
+  consumed_input_transaction_index: Int
+
+  """Hash of the transaction that produced this output."""
+  output_transaction_hash: bytea!
+
+  """Index of the output in the transaction."""
+  output_transaction_index: Int!
+}
+
+"""
+Boolean expression to filter rows from the table "transaction_outputs_status". All fields are combined with a logical 'AND'.
+"""
+input transaction_outputs_status_bool_exp {
+  _and: [transaction_outputs_status_bool_exp!]
+  _not: transaction_outputs_status_bool_exp
+  _or: [transaction_outputs_status_bool_exp!]
+  consumed_input_transaction_hash: bytea_comparison_exp
+  consumed_input_transaction_index: Int_comparison_exp
+  output_transaction_hash: bytea_comparison_exp
+  output_transaction_index: Int_comparison_exp
+}
+
+"""
+Ordering options when selecting data from "transaction_outputs_status".
+"""
+input transaction_outputs_status_order_by {
+  consumed_input_transaction_hash: order_by
+  consumed_input_transaction_index: order_by
+  output_transaction_hash: order_by
+  output_transaction_index: order_by
+}
+
+"""
+select columns of table "transaction_outputs_status"
+"""
+enum transaction_outputs_status_select_column {
+  """column name"""
+  consumed_input_transaction_hash
+
+  """column name"""
+  consumed_input_transaction_index
+
+  """column name"""
+  output_transaction_hash
+
+  """column name"""
+  output_transaction_index
+}
+
+"""
+Streaming cursor of the table "transaction_outputs_status"
+"""
+input transaction_outputs_status_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: transaction_outputs_status_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input transaction_outputs_status_stream_cursor_value_input {
+  """Hash of the transaction that consumed this output, if applicable."""
+  consumed_input_transaction_hash: bytea
+
+  """
+  Index of the input in the consuming transaction that spent this output.
+  """
+  consumed_input_transaction_index: Int
+
+  """Hash of the transaction that produced this output."""
+  output_transaction_hash: bytea
+
+  """Index of the output in the transaction."""
+  output_transaction_index: Int
+}
+
+"""
+Indexes XUDT cells, recording transaction details, addresses involved, token amounts, and additional script arguments or data related to the tokens.
+"""
+type xudt_cell {
+  """An object relationship"""
+  address: addresses!
+
+  """An object relationship"""
+  addressByTypeId: addresses!
+
+  """Amount of tokens in this cell."""
+  amount: numeric!
+
+  """
+  Indicates whether this cell has been spent in a subsequent transaction.
+  """
+  is_consumed: Boolean!
+
+  """Reference to the address that locks this cell."""
+  lock_id: String!
+
+  """Hash of the transaction that includes this cell."""
+  transaction_hash: bytea!
+
+  """Index of the output in the transaction."""
+  transaction_index: Int!
+
+  """Reference to the type script defining this token."""
+  type_id: String!
+
+  """Additional arguments related to XUDT."""
+  xudt_args: [String!]
+
+  """Extra data associated with XUDT."""
+  xudt_data: [String!]
+
+  """Lock script for the XUDT data."""
+  xudt_data_lock: bytea
+
+  """Hash of the owner lock script for XUDT."""
+  xudt_owner_lock_script_hash: bytea
+}
+
+"""
+order by aggregate values of table "xudt_cell"
+"""
+input xudt_cell_aggregate_order_by {
+  avg: xudt_cell_avg_order_by
+  count: order_by
+  max: xudt_cell_max_order_by
+  min: xudt_cell_min_order_by
+  stddev: xudt_cell_stddev_order_by
+  stddev_pop: xudt_cell_stddev_pop_order_by
+  stddev_samp: xudt_cell_stddev_samp_order_by
+  sum: xudt_cell_sum_order_by
+  var_pop: xudt_cell_var_pop_order_by
+  var_samp: xudt_cell_var_samp_order_by
+  variance: xudt_cell_variance_order_by
+}
+
+"""
+order by avg() on columns of table "xudt_cell"
+"""
+input xudt_cell_avg_order_by {
+  """Amount of tokens in this cell."""
+  amount: order_by
+
+  """Index of the output in the transaction."""
+  transaction_index: order_by
+}
+
+"""
+Boolean expression to filter rows from the table "xudt_cell". All fields are combined with a logical 'AND'.
+"""
+input xudt_cell_bool_exp {
+  _and: [xudt_cell_bool_exp!]
+  _not: xudt_cell_bool_exp
+  _or: [xudt_cell_bool_exp!]
+  address: addresses_bool_exp
+  addressByTypeId: addresses_bool_exp
+  amount: numeric_comparison_exp
+  is_consumed: Boolean_comparison_exp
+  lock_id: String_comparison_exp
+  transaction_hash: bytea_comparison_exp
+  transaction_index: Int_comparison_exp
+  type_id: String_comparison_exp
+  xudt_args: String_array_comparison_exp
+  xudt_data: String_array_comparison_exp
+  xudt_data_lock: bytea_comparison_exp
+  xudt_owner_lock_script_hash: bytea_comparison_exp
+}
+
+"""
+order by max() on columns of table "xudt_cell"
+"""
+input xudt_cell_max_order_by {
+  """Amount of tokens in this cell."""
+  amount: order_by
+
+  """Reference to the address that locks this cell."""
+  lock_id: order_by
+
+  """Index of the output in the transaction."""
+  transaction_index: order_by
+
+  """Reference to the type script defining this token."""
+  type_id: order_by
+
+  """Additional arguments related to XUDT."""
+  xudt_args: order_by
+
+  """Extra data associated with XUDT."""
+  xudt_data: order_by
+}
+
+"""
+order by min() on columns of table "xudt_cell"
+"""
+input xudt_cell_min_order_by {
+  """Amount of tokens in this cell."""
+  amount: order_by
+
+  """Reference to the address that locks this cell."""
+  lock_id: order_by
+
+  """Index of the output in the transaction."""
+  transaction_index: order_by
+
+  """Reference to the type script defining this token."""
+  type_id: order_by
+
+  """Additional arguments related to XUDT."""
+  xudt_args: order_by
+
+  """Extra data associated with XUDT."""
+  xudt_data: order_by
+}
+
+"""Ordering options when selecting data from "xudt_cell"."""
+input xudt_cell_order_by {
+  address: addresses_order_by
+  addressByTypeId: addresses_order_by
+  amount: order_by
+  is_consumed: order_by
+  lock_id: order_by
+  transaction_hash: order_by
+  transaction_index: order_by
+  type_id: order_by
+  xudt_args: order_by
+  xudt_data: order_by
+  xudt_data_lock: order_by
+  xudt_owner_lock_script_hash: order_by
+}
+
+"""
+select columns of table "xudt_cell"
+"""
+enum xudt_cell_select_column {
+  """column name"""
+  amount
+
+  """column name"""
+  is_consumed
+
+  """column name"""
+  lock_id
+
+  """column name"""
+  transaction_hash
+
+  """column name"""
+  transaction_index
+
+  """column name"""
+  type_id
+
+  """column name"""
+  xudt_args
+
+  """column name"""
+  xudt_data
+
+  """column name"""
+  xudt_data_lock
+
+  """column name"""
+  xudt_owner_lock_script_hash
+}
+
+"""
+order by stddev() on columns of table "xudt_cell"
+"""
+input xudt_cell_stddev_order_by {
+  """Amount of tokens in this cell."""
+  amount: order_by
+
+  """Index of the output in the transaction."""
+  transaction_index: order_by
+}
+
+"""
+order by stddev_pop() on columns of table "xudt_cell"
+"""
+input xudt_cell_stddev_pop_order_by {
+  """Amount of tokens in this cell."""
+  amount: order_by
+
+  """Index of the output in the transaction."""
+  transaction_index: order_by
+}
+
+"""
+order by stddev_samp() on columns of table "xudt_cell"
+"""
+input xudt_cell_stddev_samp_order_by {
+  """Amount of tokens in this cell."""
+  amount: order_by
+
+  """Index of the output in the transaction."""
+  transaction_index: order_by
+}
+
+"""
+Streaming cursor of the table "xudt_cell"
+"""
+input xudt_cell_stream_cursor_input {
+  """Stream column input with initial value"""
+  initial_value: xudt_cell_stream_cursor_value_input!
+
+  """cursor ordering"""
+  ordering: cursor_ordering
+}
+
+"""Initial value of the column from where the streaming should start"""
+input xudt_cell_stream_cursor_value_input {
+  """Amount of tokens in this cell."""
+  amount: numeric
+
+  """
+  Indicates whether this cell has been spent in a subsequent transaction.
+  """
+  is_consumed: Boolean
+
+  """Reference to the address that locks this cell."""
+  lock_id: String
+
+  """Hash of the transaction that includes this cell."""
+  transaction_hash: bytea
+
+  """Index of the output in the transaction."""
+  transaction_index: Int
+
+  """Reference to the type script defining this token."""
+  type_id: String
+
+  """Additional arguments related to XUDT."""
+  xudt_args: [String!]
+
+  """Extra data associated with XUDT."""
+  xudt_data: [String!]
+
+  """Lock script for the XUDT data."""
+  xudt_data_lock: bytea
+
+  """Hash of the owner lock script for XUDT."""
+  xudt_owner_lock_script_hash: bytea
+}
+
+"""
+order by sum() on columns of table "xudt_cell"
+"""
+input xudt_cell_sum_order_by {
+  """Amount of tokens in this cell."""
+  amount: order_by
+
+  """Index of the output in the transaction."""
+  transaction_index: order_by
+}
+
+"""
+order by var_pop() on columns of table "xudt_cell"
+"""
+input xudt_cell_var_pop_order_by {
+  """Amount of tokens in this cell."""
+  amount: order_by
+
+  """Index of the output in the transaction."""
+  transaction_index: order_by
+}
+
+"""
+order by var_samp() on columns of table "xudt_cell"
+"""
+input xudt_cell_var_samp_order_by {
+  """Amount of tokens in this cell."""
+  amount: order_by
+
+  """Index of the output in the transaction."""
+  transaction_index: order_by
+}
+
+"""
+order by variance() on columns of table "xudt_cell"
+"""
+input xudt_cell_variance_order_by {
+  """Amount of tokens in this cell."""
+  amount: order_by
+
+  """Index of the output in the transaction."""
+  transaction_index: order_by
+}
+
